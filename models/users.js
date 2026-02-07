@@ -1320,7 +1320,7 @@ Users.helpers({
         if (widths[boardId] && widths[boardId][listId]) {
           const width = widths[boardId][listId];
           // Validate it's a valid number
-          if (validators.isValidNumber(width, 100, 1000)) {
+          if (validators.isValidNumber(width, 270, 1000)) {
             return width;
           }
         }
@@ -1339,7 +1339,7 @@ Users.helpers({
     }
 
     // Validate width before storing
-    if (!validators.isValidNumber(width, 100, 1000)) {
+    if (!validators.isValidNumber(width, 270, 1000)) {
       console.warn('Invalid list width:', width);
       return false;
     }

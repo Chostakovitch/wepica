@@ -5,18 +5,18 @@ template(name="swimlane")
     unless collapseSwimlane
       .swimlane.js-lists.js-swimlane.dragscroll(id="swimlane-{{_id}}")
         if isMiniScreen
+          if currentListIsInThisSwimlane _id
+            +list(currentList)
+          unless currentList
+            if currentUser.isBoardMember
+              unless currentUser.isCommentOnly
+                +addListForm
           each lists
-            +miniList(this)
-          if currentUser.isBoardMember
-            unless currentUser.isCommentOnly
-              +addListForm
-        else
-          if currentUser.isBoardMember
-            unless currentUser.isCommentOnly
-              +addListForm
-          each lists
-            if visible this
-              +list(this)
+            with(this)
+              unless currentList
+                +miniList(this)
+          if currentCardIsInThisList _id ../_id
+            +cardDetails(currentCard)
       //- allow resizing in mobile mode
       .swimlane-resize-handle.js-swimlane-resize-handle.nodragscroll
 

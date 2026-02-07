@@ -86,7 +86,6 @@ body.mobile-mode .swimlane {
     display: none;
   }
 }
-
 .swimlane .swimlane-header-wrap .swimlane-header-handle {
   cursor: move;
   pointer-events: auto;

@@ -282,7 +282,11 @@ textarea::-moz-placeholder {
   button {
     display: flex;
     justify-content: center;
+
     align-items: center;
+    align-self: center;
+    height: 2lh;
+    flex: 1;
   }
 }
 
@@ -311,6 +315,7 @@ textarea::-moz-placeholder {
 .edit-controls input[type=button],
 .add-controls input[type=button] {
   margin: 0;
+  flex: 1;
 }
 [type="checkbox"]:not(:checked),
 [type="checkbox"]:checked {

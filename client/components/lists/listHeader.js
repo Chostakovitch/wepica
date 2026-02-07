@@ -132,6 +132,15 @@ BlazeComponent.extendComponent({
           this.starred(!this.starred());
         },
         'click .js-open-list-menu': Popup.open('listAction'),
+        'click .js-add-card.list-header-plus-top'(event) {
+          const listDom = $(event.target).parents(
+            `#js-list-${this.currentData()._id}`,
+          )[0];
+          const listComponent = BlazeComponent.getComponentForElement(listDom);
+          listComponent.openForm({
+            position: 'top',
+          });
+        },
         'click .js-unselect-list'() {
           Session.set('currentList', null);
         },
@@ -412,7 +421,7 @@ BlazeComponent.extendComponent({
     );
 
     // FIXME(mark-i-m): where do we put constants?
-    if (width < 100 || !width || constraint < 100 || !constraint) {
+    if (width < 270 || !width || constraint < 270 || !constraint) {
       Template.instance()
         .$('.list-width-error')
         .click();
@@ -463,17 +472,10 @@ BlazeComponent.extendComponent({
     // Get the swimlane context from opener
     const openerData = Popup.getOpenerComponent()?.data();
 
-    // If opened from swimlane menu, openerData is the swimlane
-    if (openerData?.type === 'swimlane' || openerData?.type === 'template-swimlane') {
-      this.currentSwimlane = openerData;
-      this.currentSwimlaneId.set(openerData._id);
-    } else if (openerData?._id) {
-      // If opened from list menu, get swimlane from the list
-      const list = ReactiveCache.getList({ _id: openerData._id });
-      this.currentSwimlane = list?.swimlaneId ? ReactiveCache.getSwimlane({ _id: list.swimlaneId }) : null;
-      this.currentSwimlaneId.set(this.currentSwimlane?._id || null);
-      this.currentListId.set(openerData._id);
-    }
+    // Get swimlane from data,
+    // which is linked by popup
+    this.currentSwimlane = this.currentData();
+    this.currentSwimlaneId.set(this.currentSwimlane._id);
   },
 
   currentSwimlaneData() {
@@ -547,7 +549,8 @@ BlazeComponent.extendComponent({
             swimlaneId: swimlaneId,
           });
 
-          Popup.back();
+          // Menu + list
+          Popup.back(2);
         },
         'click .js-list-template': Popup.open('searchElement'),
       },

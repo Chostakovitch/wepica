@@ -132,7 +132,7 @@ BlazeComponent.extendComponent({
     let isResizing = false;
     let previousLimit = false;
     // seems reasonable; better let user shrink too much that too little
-    const minWidth = 280;
+    const minWidth = 270;
     // stored width
     const width = this.listWidth();
     // min-width is initially min-content; a good start

@@ -578,8 +578,6 @@ a:not(.disabled).is-active i.fa {
   /* Form elements */
   input, select, textarea {
      /* Prevent zoom on iOS */
-    padding: 12px;
-    min-height: 44px;
     touch-action: manipulation;
   }
 

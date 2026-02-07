@@ -47,10 +47,12 @@
 .pop-over  {
   /* feels like it's too ad-hod */
   input, a:not(.js-board-template, .member, .edit-avatar) {
-    display: inline-flex;
+    display: flex;
     align-items: center;
     gap: 1ch;
     min-height: 1.5lh;
+    display: flex;
+    flex: 1;
   }
 }
 .pop-over .sub-name {
@@ -309,7 +311,7 @@ body.grey-icons-enabled .pop-over-list .pop-over-list.checkable .fa-check {
 }
 
 .pop-over .content > form {
-  padding: 0 1ch;
+  padding: 0.3lh 1ch;
   gap: 0.2lh;
   display: flex;
   max-width: clamp(20vw, 400px, 50vw);

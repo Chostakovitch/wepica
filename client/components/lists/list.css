@@ -189,9 +189,6 @@ body.mobile-mode {
 }
 
 .mini-list {
-  .list-header {
-    padding: 0.5lh 2ch;
-  }
   .list-header-name-container {
     /* on mobile, put card count below list name for a nice alignement effect */
     grid-auto-flow: row;
@@ -208,6 +205,15 @@ body.mobile-mode {
 
 .list-header .list-header-name p {
   margin: 0;
+}
+
+.list-header .list-header-plus-top {
+  position: absolute !important;
+  top: 5px !important;
+  right: 30px !important;
+  z-index: 15 !important;
+  display: inline-block !important;
+  padding: 4px !important;
 }
 
 .list-header .list-header-wrap {
@@ -236,7 +242,7 @@ body.mobile-mode {
   display: flex;
   justify-content: center;
   min-width: 4ch;
-  padding-top: 0.5lh;
+  padding: 0.5lh;
 }
 .list.list-auto-width {
   flex: 1;
@@ -281,6 +287,7 @@ body.mobile-mode {
 .list .list-composer .open-list-composer {
   color: #8c8c8c;
   min-width: max-content;
+  align-items: center;
 }
 .list.list-composer .list-name-input,
 .list .list-composer .list-name-input {
@@ -432,7 +439,8 @@ body.mobile-mode .list-collapsed:nth-child(2n-2) > .list-header {
   border-radius: 0.4ch;
   justify-content: center;
   align-items: center;
-  font-size: 1.4em;
+  font-size: 1.2em;
+  gap: 1ch;
 }
 body.mobile-mode .list-body .open-minicard-composer, .list-body .open-minicard-composer:hover {
   background: #fafafa;
