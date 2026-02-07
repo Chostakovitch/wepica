@@ -152,7 +152,7 @@ template(name="boardVisibilityList")
           if visibilityCheck
             i.fa.fa-check
           span.sub-name {{_ 'private-desc'}}
-    if notAllowPrivateVisibilityOnly
+    unless TableVisibilityModeSettings.allowPrivateOnly
       li
         with "public"
           a.js-select-visibility
@@ -163,7 +163,9 @@ template(name="boardVisibilityList")
             span.sub-name {{_ 'public-desc'}}
 
 template(name="boardChangeVisibilityPopup")
-  +boardVisibilityList
+  //- Ensure that anywhere the popup is opened, even in nest popups,
+  //- the data context is the current one.
+  +popup(name="boardVisibilityList" forceData=currentComponent)
 
 template(name="boardChangeWatchPopup")
   ul.pop-over-list
@@ -232,7 +234,7 @@ template(name="createBoard")
       | {{_ 'title'}}
       input.js-new-board-title(type="text" placeholder="{{_ 'bucket-example'}}" autofocus required)
     if visibilityMenuIsOpen.get
-      +boardVisibilityList
+      +boardChangeVisibilityPopup
     else
       p.quiet
         if $eq visibility.get 'public'
@@ -262,7 +264,7 @@ template(name="createBoardPopup")
       | {{_ 'title'}}
       input.js-new-board-title(type="text" placeholder="{{_ 'bucket-example'}}" autofocus required)
     if visibilityMenuIsOpen.get
-      +boardVisibilityList
+      +boardChangeVisibilityPopup
     else
       p.quiet
         if $eq visibility.get 'public'
@@ -293,7 +295,7 @@ template(name="createTemplateContainerPopup")
       | {{_ 'title'}}
       input.js-new-board-title(type="text" placeholder="{{_ 'bucket-example'}}" autofocus required)
     if visibilityMenuIsOpen.get
-      +boardVisibilityList
+      +boardChangeVisibilityPopup
     else
       p.quiet
         if $eq visibility.get 'public'

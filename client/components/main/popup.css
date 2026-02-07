@@ -55,15 +55,13 @@
     flex: 1;
   }
 }
-.pop-over .sub-name {
-  max-width: clamp(30vw, 500px, 80%);
-}
+
 .pop-over .header {
   display: flex;
   justify-content: space-between;
   gap: 1ch;
   align-items: center;
-  padding: 0 1ch;
+  padding: 1ch;
   background: #f7f7f7;
   border-bottom: 1px solid #dcdcdc;
   color: #666;
@@ -148,11 +146,13 @@ body.mobile-mode  {
   flex-direction: column;
   flex: 1;
   font-size: 1.1rem;
-  padding: 0 1ch;
+  padding: 1ch;
   >li>a {
+    flex: 1;
+    justify-self: stretch;
     display: grid;
     grid-auto-flow: column;
-    grid-auto-columns: fit-content;
+    grid-auto-columns: auto;
     justify-content: start;
     padding: 0 0.5ch;
     column-gap: 1ch;

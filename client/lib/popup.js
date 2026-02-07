@@ -7,10 +7,10 @@ window.Popup = new (class {
   ///     'click .elementClass': Popup.open("popupName"),
   ///   });
   /// The popup inherit the data context of its parent.
-  open(name, args) {
+  open(name, args, suffix = 'Popup') {
     const self = this;
     return function(evt, options) {
-      const popupName = `${name}Popup`;
+      const popupName = `${name}${suffix}`;
       const openerElement = evt.target;
       let classicArgs = { openerElement: openerElement, name: popupName, title: self._getTitle(popupName), miscOptions: options };
       if (typeof(args) === "object") {
