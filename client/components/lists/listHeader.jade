@@ -46,21 +46,24 @@ template(name="listHeader")
             if hasNumberFieldsSum
               | &nbsp;
               span.list-sum-badge(title="{{_ 'sum-of-number-fields'}}") ∑ {{numberFieldsSum}}
+        div.list-header-menu
+          unless currentUser.isCommentOnly
+            unless currentUser.isReadOnly
+              unless currentUser.isReadAssignedOnly
+                a.js-open-list-menu(title="{{_ 'listActionPopup-title'}}")
+                  i.fa.fa-bars
       if isMiniScreen
         if currentList
           if isWatching
-            i.list-header-watch-icon i.fa.fa-eye
+            i.list-header-watch-icon.i.fa.fa-eye
           div.list-header-menu
             unless currentUser.isCommentOnly
               unless currentUser.isReadOnly
                 unless currentUser.isReadAssignedOnly
-                  if canSeeAddCard
-                    a.js-add-card.list-header-plus-top(title="{{_ 'add-card-to-top-of-list'}}")
-                      i.fa.fa-plus
                   a.js-open-list-menu(title="{{_ 'listActionPopup-title'}}")
                     i.fa.fa-bars
           unless currentUser.isWorker
-            if isTouchScreenOrShowDesktopDragHandles
+            if isMiniScreen
               a.list-header-handle.handle.js-list-handle
                 i.fa.fa-arrows
       else if currentUser.isBoardMember
@@ -227,8 +230,8 @@ template(name="setListWidthPopup")
   #js-list-width-edit
     label {{_ 'set-list-width-value'}}
       p
-        input.list-width-value(type="number" value="{{ listWidthValue }}" min="270")
-        input.list-constraint-value(type="number" value="{{ listConstraintValue }}" min="270")
+        input.list-width-value(type="number" value="{{ listWidthValue }}" min="100")
+        input.list-constraint-value(type="number" value="{{ listConstraintValue }}" min="100")
         input.list-width-apply(type="submit" value="{{_ 'apply'}}")
         input.list-width-error
         br

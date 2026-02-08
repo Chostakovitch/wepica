@@ -18,6 +18,15 @@ BlazeComponent.extendComponent({
     });
   },
 
+  onRendered() {
+    /* #FIXME I have no idea why this exact same
+    event won't fire when in event maps */
+    $(this.find('.js-collapse')).on('click', (e) => {
+      e.preventDefault();
+      this.collapsed(!this.collapsed());
+    });
+  },
+
   canSeeAddCard() {
     const list = Template.currentData();
     return (
