@@ -14,6 +14,17 @@ echo
 PS3='Please enter your choice: '
 options=("Install Wekan dependencies" "Build Wekan" "Run Meteor for dev on http://localhost:4000" "Run Meteor for dev on http://localhost:4000 with trace warnings, and warnings using old Meteor API that will not exist in Meteor 3.0" "Run Meteor for dev on http://localhost:4000 with bundle visualizer" "Run Meteor for dev on http://CURRENT-IP-ADDRESS:4000" "Run Meteor for dev on http://CURRENT-IP-ADDRESS:4000 with MONGO_URL=mongodb://127.0.0.1:27019/wekan" "Run Meteor for dev on http://CUSTOM-IP-ADDRESS:PORT" "Run tests" "Save Meteor dependency chain to ../meteor-deps.txt" "Quit")
 
+if [[ "$OSTYPE" == "linux-gnu" ]]; then
+	# Same idea as a venv; node/npm binaries and packages
+	# are contained in this folder; as it depends on node version,
+	# multiple versions can be tested altogether
+	# Add node and npm to the PATH so the commands are available (only for current script)
+	NODE_VERSION="14.21.4"
+	DIR_NODE="$HOME/.local/wekan"
+	export NODE_PATH="$DIR_NODE/v$NODE_VERSION/lib/node_modules"
+	export PATH="$DIR_NODE/v$NODE_VERSION/bin:$PATH"
+fi
+
 select opt in "${options[@]}"
 do
     case $opt in
@@ -21,34 +32,67 @@ do
 
 		if [[ "$OSTYPE" == "linux-gnu" ]]; then
 			echo "Linux";
-			# Debian, Ubuntu, Mint
-			sudo apt install -y build-essential gcc g++ make git curl wget p7zip-full zip unzip unp npm p7zip-full
-			#curl -fsSL https://deb.nodesource.com/setup_14.x | sudo -E bash -
-			#sudo apt-get install -y nodejs
-			#sudo apt-get install -y npm
-			# Volta Node and NPM install manager, made with Rust https://volta.sh
-			# Volta uses home directory also with "npm -g install", no sudo needed.
-			# Volta install script is broken, so using n.
-			#curl https://get.volta.sh | bash
-			#export VOLTA_HOME="$HOME/.volta"
-			#export PATH="$VOLTA_HOME/bin:$PATH"
-			#volta install node@14
-			# npm nodejs
-			#curl -0 -L https://npmjs.org/install.sh | sudo sh
-			#sudo chown -R $(id -u):$(id -g) $HOME/.npm
-			sudo npm -g install n
-			# Using custom Node.js mirror with n Node.js version manager
-			# - Custom source: https://github.com/tj/n#custom-source
-			# - sudo -E uses existing environment variables, so that this can be used in build script:
-			#   https://github.com/tj/n/issues/584#issuecomment-523640742
-			export N_NODE_MIRROR=https://github.com/wekan/node-v14-esm/releases/download
-			sudo -E n 14.21.4
-			sudo npm -g uninstall node-pre-gyp
+			# Credits to: https://unix.stackexchange.com/questions/46081/identifying-the-system-package-manager
+			declare -A os_info=(
+				[/etc/redhat-release]='yum'
+				[/etc/arch-release]='pacman'
+				[/etc/gentoo-release]='emerge'
+				[/etc/SuSE-release]='zypp'
+				[/etc/debian_version]='apt-get'
+				[/etc/alpine-release]='apk'
+			)
+			for f in ${!os_info[@]}
+			do
+				if [[ -f ${f} ]]; then
+					pmgr=${os_info[$f]}
+					echo Base package manager: ${pmgr}
+
+					case ${pmgr} in
+						'apt-get')
+							sudo apt-get install -y build-essential gcc g++ make git curl wget p7zip-full zip unzip unp p7zip-full
+							;;
+						'pacman')
+							pmgr='sudo pacman'
+							if command -v yay &> /dev/null; then
+								# escalate privileges itself if needed, preferable in a script
+								pmgr=yay
+								echo "using yay."
+							fi
+							${pmgr} -S --needed gcc make git curl wget 7zip zip unzip
+							;;
+						*)
+							echo "${pmgr} not configured; you may contribute to the script!"
+							echo "installation will continue as you may already have requirements."
+							;;
+					esac
+				fi
+			done
+			NODE_VERSION="14.21.4"
+			NODE_URL="https://github.com/wekan/node-v14-esm/releases/download/v${NODE_VERSION}/node-v${NODE_VERSION}-linux-x64.tar.gz"
+			[ ! -d ${DIR_NODE} ] && mkdir -p ${DIR_NODE}
+
+			# Download and install Node.js using wget
+			wget -qO- "$NODE_URL" | tar -xz -C "$DIR_NODE"/ && mv "$DIR_NODE"/node-v${NODE_VERSION}-linux-x64 "$DIR_NODE"/v$NODE_VERSION
+
+			# Add node and npm to the PATH so the commands are available (only for current script)
+			npm -g uninstall node-pre-gyp
 			# Latest fibers for Meteor sudo mkdir -p /usr/local/lib/node_modules/fibers/.node-gyp sudo npm -g install fibers
-			sudo npm -g install @mapbox/node-pre-gyp
+			npm -g install @mapbox/node-pre-gyp
 			# Install Meteor, if it's not yet installed
-			sudo npm -g install meteor@2.16 --unsafe-perm
+			npm -g install meteor@2.16 --unsafe-perm
 			#sudo chown -R $(id -u):$(id -g) $HOME/.npm $HOME/.meteor
+
+			echo "the versions below should be the ones Wekan needs:"
+			# Confirm the installation
+			node -v
+			npm -v
+
+			node_help="NODE_PATH=$DIR_NODE/v$NODE_VERSION/lib/node_modules"
+			path_help="PATH=$DIR_NODE/v$NODE_VERSION/bin:\$PATH"
+			echo "Use the following environment variables if you want to manipulate node/npm manually"
+			echo $node_help
+			echo $path_help
+
 		elif [[ "$OSTYPE" == "darwin"* ]]; then
 			echo "macOS"
 			softwareupdate --install-rosetta --agree-to-license
