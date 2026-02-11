@@ -18,9 +18,11 @@ if [[ "$OSTYPE" == "linux-gnu" ]]; then
 	# Same idea as a venv; node/npm binaries and packages
 	# are contained in this folder; as it depends on node version,
 	# multiple versions can be tested altogether
-	# Add node and npm to the PATH so the commands are available (only for current script)
 	NODE_VERSION="14.21.4"
 	DIR_NODE="$HOME/.local/wekan"
+	NODE_URL="https://github.com/wekan/node-v14-esm/releases/download/v${NODE_VERSION}/node-v${NODE_VERSION}-linux-x64.tar.gz"
+
+	# Add node and npm to the PATH so the commands are available (only for current script)
 	export NODE_PATH="$DIR_NODE/v$NODE_VERSION/lib/node_modules"
 	export PATH="$DIR_NODE/v$NODE_VERSION/bin:$PATH"
 fi
@@ -67,8 +69,6 @@ do
 					esac
 				fi
 			done
-			NODE_VERSION="14.21.4"
-			NODE_URL="https://github.com/wekan/node-v14-esm/releases/download/v${NODE_VERSION}/node-v${NODE_VERSION}-linux-x64.tar.gz"
 			[ ! -d ${DIR_NODE} ] && mkdir -p ${DIR_NODE}
 
 			# Download and install Node.js using wget
