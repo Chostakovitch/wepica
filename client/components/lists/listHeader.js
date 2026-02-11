@@ -18,6 +18,15 @@ BlazeComponent.extendComponent({
     });
   },
 
+  onRendered() {
+    /* #FIXME I have no idea why this exact same
+    event won't fire when in event maps */
+    $(this.find('.js-collapse')).on('click', (e) => {
+      e.preventDefault();
+      this.collapsed(!this.collapsed());
+    });
+  },
+
   canSeeAddCard() {
     const list = Template.currentData();
     return (
@@ -472,17 +481,10 @@ BlazeComponent.extendComponent({
     // Get the swimlane context from opener
     const openerData = Popup.getOpenerComponent()?.data();
 
-    // If opened from swimlane menu, openerData is the swimlane
-    if (openerData?.type === 'swimlane' || openerData?.type === 'template-swimlane') {
-      this.currentSwimlane = openerData;
-      this.currentSwimlaneId.set(openerData._id);
-    } else if (openerData?._id) {
-      // If opened from list menu, get swimlane from the list
-      const list = ReactiveCache.getList({ _id: openerData._id });
-      this.currentSwimlane = list?.swimlaneId ? ReactiveCache.getSwimlane({ _id: list.swimlaneId }) : null;
-      this.currentSwimlaneId.set(this.currentSwimlane?._id || null);
-      this.currentListId.set(openerData._id);
-    }
+    // Get swimlane from data,
+    // which is linked by popup
+    this.currentSwimlane = this.currentData();
+    this.currentSwimlaneId.set(this.currentSwimlane._id);
   },
 
   currentSwimlaneData() {
@@ -556,7 +558,8 @@ BlazeComponent.extendComponent({
             swimlaneId: swimlaneId,
           });
 
-          Popup.back();
+          // Menu + list
+          Popup.back(2);
         },
         'click .js-list-template': Popup.open('searchElement'),
       },

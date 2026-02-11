@@ -769,6 +769,7 @@ BlazeComponent.extendComponent({
       },
       {
         'click .js-list-template': Popup.open('searchElement'),
+        'click .js-open-add-card-popup': Popup.open('addList')
       },
     ];
   },

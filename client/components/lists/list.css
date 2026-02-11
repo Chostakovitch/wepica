@@ -281,6 +281,7 @@ body.mobile-mode {
 .list .list-composer .open-list-composer {
   color: #8c8c8c;
   min-width: max-content;
+  align-items: center;
 }
 .list.list-composer .list-name-input,
 .list .list-composer .list-name-input {
@@ -432,7 +433,8 @@ body.mobile-mode .list-collapsed:nth-child(2n-2) > .list-header {
   border-radius: 0.4ch;
   justify-content: center;
   align-items: center;
-  font-size: 1.4em;
+  font-size: 1.2em;
+  gap: 1ch;
 }
 body.mobile-mode .list-body .open-minicard-composer, .list-body .open-minicard-composer:hover {
   background: #fafafa;

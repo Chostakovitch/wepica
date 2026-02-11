@@ -156,10 +156,6 @@
   max-width: 100%;
   margin-right: 0.5vw;
 }
-.minicard .handle {
-  display: none;
-  z-index: 1;
-}
 
 @media only screen {
   .minicard .handle {

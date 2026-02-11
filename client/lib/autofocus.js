@@ -28,6 +28,11 @@ Meteor.startup(() => {
     let shouldFocus = false;
     mutations.forEach((mutation) => {
       mutation.addedNodes.forEach((node) => {
+        // A way to check if the node is restricted, otherwise it produces permission error in some browser, maybe with some extensions
+        // An example node which produces an exception is
+        // `<ne-bwgqpcw popover="manual" style="border-block: initial !i…up: initial !important;">`.
+        // See https://html.spec.whatwg.org/multipage/structured-data.html#safe-passing-of-structured-data and
+        if (!(node instanceof Object)) {return;}
         if (node.nodeType === 1) { // Element node
           if (node.hasAttribute && node.hasAttribute('autofocus')) {
             shouldFocus = true;
@@ -49,6 +54,7 @@ Meteor.startup(() => {
   observer.observe(document.body, {
     childList: true,
     subtree: true,
+    attributes: true
   });
 
   // Also handle initial autofocus elements

@@ -1510,7 +1510,6 @@
   "steps": "кораци",
   "view": "Поглед",
   "has-swimlanes": "има више поступака",
-
   "step-analyze-board-structure": "Изучавам везе у списима",
   "step-fix-orphaned-cards": "Поправљам одбачене предмете",
   "step-convert-shared-lists": "Претварам дељене делове поступка",

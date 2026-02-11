@@ -1,4 +1,5 @@
 .swimlane.js-lists{
+.swimlane.js-lists{
   background: #dedede;
   display: flex;
   overflow: auto;
@@ -86,7 +87,6 @@ body.mobile-mode .swimlane {
     display: none;
   }
 }
-
 .swimlane .swimlane-header-wrap .swimlane-header-handle {
   cursor: move;
   pointer-events: auto;

@@ -39,6 +39,14 @@ BlazeComponent.extendComponent({
     return user && user.hasStarred(boardId);
   },
 
+  visibilityCheck(visibility) {
+    return visibility === Utils.getCurrentBoard()?.permission;
+  },
+
+  setVisibility(visibility) {
+    Utils.getCurrentBoard().setVisibility(visibility);
+  },
+
   // Only show the star counter if the number of star is greater than 2
   showStarCounter() {
     const currentBoard = Utils.getCurrentBoard();
@@ -76,7 +84,9 @@ BlazeComponent.extendComponent({
           }
         },
         'click .js-open-board-menu': Popup.open('boardMenu'),
-        'click .js-change-visibility': Popup.open('boardChangeVisibility'),
+        // We use the same popup for new visibility and changing
+        // visibility but with different data context
+        'click .js-change-visibility': Popup.open('boardVisibilityList', { forceData: this.currentComponent(), showHeader: false }, suffix = ''),
         'click .js-watch-board': Popup.open('boardChangeWatch'),
         'click .js-open-archived-board'() {
           Modal.open('archivedBoards');
@@ -218,27 +228,17 @@ const CreateBoard = BlazeComponent.extendComponent({
   },
 
   onCreated() {
-    this.visibilityMenuIsOpen = new ReactiveVar(false);
     this.visibility = new ReactiveVar('private');
     this.boardId = new ReactiveVar('');
     Meteor.subscribe('tableVisibilityModeSettings');
   },
 
-  notAllowPrivateVisibilityOnly(){
-    return !TableVisibilityModeSettings.findOne('tableVisibilityMode-allowPrivateOnly').booleanValue;
-  },
-
-  visibilityCheck() {
-    return this.currentData() === this.visibility.get();
+  visibilityCheck(visibility) {
+    return visibility === this.visibility.get();
   },
 
   setVisibility(visibility) {
     this.visibility.set(visibility);
-    this.visibilityMenuIsOpen.set(false);
-  },
-
-  toggleVisibilityMenu() {
-    this.visibilityMenuIsOpen.set(!this.visibilityMenuIsOpen.get());
   },
 
   toggleAddTemplateContainer() {
@@ -339,10 +339,9 @@ const CreateBoard = BlazeComponent.extendComponent({
   events() {
     return [
       {
-        'click .js-select-visibility'() {
-          this.setVisibility(this.currentData());
-        },
-        'click .js-change-visibility': this.toggleVisibilityMenu,
+        //- Ensure that anywhere the popup is opened, even in nested popups,
+        //- the data context is the current one.
+        'click .js-change-visibility': Popup.open('boardVisibilityList', { forceData: this.currentComponent(), showHeader: false }, suffix = ''),
         'click .js-import': Popup.open('boardImportBoard'),
         submit: this.onSubmit,
         'click .js-import-board': Popup.open('chooseBoardSource'),
@@ -368,30 +367,28 @@ const CreateBoard = BlazeComponent.extendComponent({
   }
 }.register('headerBarCreateBoardPopup'));
 
-BlazeComponent.extendComponent({
-  notAllowPrivateVisibilityOnly(){
-    return !TableVisibilityModeSettings.findOne('tableVisibilityMode-allowPrivateOnly').booleanValue;
-  },
+class BoardVisibilityListComponent extends BlazeComponent {
   visibilityCheck() {
-    const currentBoard = Utils.getCurrentBoard();
-    return this.currentData() === currentBoard.permission;
-  },
+    return this.data().visibilityCheck(this.currentData());
+  }
 
   selectBoardVisibility() {
-    const currentBoard = Utils.getCurrentBoard();
-    const visibility = this.currentData();
-    currentBoard.setVisibility(visibility);
+    /* What's interesting is that the reactive variable
+    can be anything (e.g. new board or existing board),
+    but we don't care; the caller does the job. */
+    this.data().setVisibility(this.currentData());
     Popup.back();
-  },
+  }
 
+  /* Events maps does not work within popups without using
+  super and thus defining a class */
   events() {
-    return [
-      {
-        'click .js-select-visibility': this.selectBoardVisibility,
-      },
-    ];
-  },
-}).register('boardChangeVisibilityPopup');
+    return super.events().concat({
+      'click .js-select-visibility': this.selectBoardVisibility,
+    });
+  }
+}
+BoardVisibilityListComponent.register('boardVisibilityList');
 
 BlazeComponent.extendComponent({
   watchLevel() {

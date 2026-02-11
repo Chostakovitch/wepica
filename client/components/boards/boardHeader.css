@@ -109,3 +109,11 @@ body.mobile-mode {
   gap: 2ch;
   padding: 0 0.5ch;
 }
+
+.create-element-foooter {
+  &, > * {
+    display: flex;
+    align-items: center;
+    gap: 1ch;
+  }
+}

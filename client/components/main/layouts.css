@@ -197,6 +197,18 @@ but it worth it to let browsers take care of exact placement/sizing */
   display: block;
   float: right;
 }
+p.quiet:not:has(span) {
+  &, >:is(p, a) {
+    /* we need to compensate the fact that most of
+    flex stack in vertical. another option would be to
+    create container for eac geh view, but this may work
+    in general case */
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 0.3ch;
+  }
+}
 .quiet,
 .quiet a {
   color: #8c8c8c;
@@ -249,9 +261,6 @@ p a {
   overflow-wrap: break-word;
 }
 table,
-p {
-  margin-bottom: 1vh;
-}
 pre {
   margin: 2vh 0;
   white-space: pre;
@@ -578,8 +587,6 @@ a:not(.disabled).is-active i.fa {
   /* Form elements */
   input, select, textarea {
      /* Prevent zoom on iOS */
-    padding: 12px;
-    min-height: 44px;
     touch-action: manipulation;
   }
 

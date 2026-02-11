@@ -34,12 +34,16 @@ template(name="swimlaneFixedHeader")
   .swimlane-header-menu-right
     if currentUser
       unless currentUser.isCommentOnly
-        unless currentUser.isWorker
-          a.js-open-swimlane-menu(title="{{_ 'swimlaneActionPopup-title'}}")
-            i.fa.fa-bars
-          if isMiniScreen
-            a.swimlane-header-miniscreen-handle.handle.js-swimlane-header-handle
-              i.fa.fa-arrows
+        unless currentUser.isReadOnly
+          unless currentUser.isReadAssignedOnly
+            unless currentUser.isWorker
+              a.js-open-swimlane-menu(title="{{_ 'swimlaneActionPopup-title'}}")
+                i.fa.fa-bars
+              a.js-open-add-swimlane-menu.swimlane-header-plus-icon(title="{{_ 'add-swimlane'}}")
+                i.fa.fa-plus
+              if isMiniScreen
+                a.swimlane-header-miniscreen-handle.handle.js-swimlane-header-handle
+                  i.fa.fa-arrows
 
 template(name="editSwimlaneTitleForm")
   .list-composer

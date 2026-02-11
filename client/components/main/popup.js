@@ -542,7 +542,7 @@ class PopupComponent extends BlazeComponent {
       closeDOMs: data.closeDOMs,
       followDOM: data.followDOM,
       handleDOM: data.handleDOM,
-      forceData: data.miscOptions?.dataContextIfCurrentDataIsUndefined,
+      forceData: data.miscOptions?.dataContextIfCurrentDataIsUndefined || data.forceData,
       afterConfirm: data.miscOptions?.afterConfirm,
     }
     this.name = this.data().name;

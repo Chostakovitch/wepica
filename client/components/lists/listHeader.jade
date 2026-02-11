@@ -30,12 +30,6 @@ template(name="listHeader")
               span.list-sum-badge(title="{{_ 'sum-of-number-fields'}}") ∑ {{numberFieldsSum}}
       else
         div.list-header-name-container
-          unless isMiniScreen
-            a.list-collapse-indicator.js-collapse(title="{{_ 'collapse'}}")
-              if collapsed
-                i.fa.fa-caret-right
-              else
-                i.fa.fa-caret-down
           div(class="{{#if collapsed}}list-rotated{{/if}}").list-header-wrap
             h2.list-header-name(
               title="{{ moment modifiedAt 'LLL' }}"
@@ -68,7 +62,6 @@ template(name="listHeader")
                 unless currentUser.isReadAssignedOnly
                   a.js-open-list-menu(title="{{_ 'listActionPopup-title'}}")
                     i.fa.fa-bars
-        else
           unless currentUser.isWorker
             if isMiniScreen
               a.list-header-handle.handle.js-list-handle
@@ -82,6 +75,22 @@ template(name="listHeader")
               if isMiniScreen
                 a.list-header-handle-desktop.handle.js-list-handle(title="{{_ 'drag-list'}}")
                   i.fa.fa-arrows
+        unless collapsed
+          div.list-header-menu
+            unless currentUser.isCommentOnly
+              unless currentUser.isReadOnly
+                unless currentUser.isReadAssignedOnly
+
+                  if isTouchScreenOrShowDesktopDragHandles
+                    a.list-header-handle-desktop.handle.js-list-handle(title="{{_ 'drag-list'}}")
+                      i.fa.fa-arrows
+                  if canSeeAddCard
+                    a.js-add-card.list-header-plus-top(title="{{_ 'add-card-to-top-of-list'}}")
+                      i.fa.fa-plus
+                  //if isBoardAdmin
+                  //  a.fa.js-list-star.list-header-plus-top(class="fa-star{{#unless starred}}-o{{/unless}}")
+                  a.js-open-list-menu(title="{{_ 'listActionPopup-title'}}")
+                    i.fa.fa-bars
       unless isMiniScreen
         if collapsed
           if showCardsCountForList cards.length
@@ -233,7 +242,7 @@ template(name="setListWidthPopup")
 
 template(name="listWidthErrorPopup")
   .list-width-invalid
-    p {{_ 'list-width-error-message'}} '&gt;=100'
+    p {{_ 'list-width-error-message'}} '&gt;=270'
     button.negate.js-back-view(type="submit") {{_ 'cancel'}}
 
 template(name="setListColorPopup")
