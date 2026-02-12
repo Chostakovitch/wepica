@@ -9,22 +9,84 @@ Later it could be useful to use a CSS superset */
 
 :root {
   scroll-behavior: smooth;
-  --label-height: 1.7lh;
-  --header-scale: clamp(1rem, 1.333rem + -0.333vw, 1.3rem)
-  --popup-margin: 2vmax;
+  /* The base behaviour, under which all the rest is constructed, is that:
+  - At 1400 pixels width and above, 1rem = 16px;
+  - At 440 pixels width and below, 1rem = 22px
+  - Between, change is linear
+  Besides, the changes between the size of fonts depends on the container's width ("type scale"):
+  - It is 1.414 at 440px- and 1.2 and 1440px+. Basically it means that font size scales less on mobile.
+  Use the following link to play around and change: /* @link https: //utopia.fyi/type/calculator?c=440,22,1.125,1400,16,1.2,5,3,&s=0.75|0.5|0.25,1.5|2|3|4|6,s-l|l-s|3xs-l|2xs-m|xs-m|m-xl&g=s,l,xl,NaN */
+  /* Step -3: 15.4513px → 9.2593px */
+  --step--3: clamp(0.5787rem, 1.1431rem + -0.645vw, 0.9657rem);
+  /* Step -2: 17.3827px → 11.1111px */
+  --step--2: clamp(0.6944rem, 1.2661rem + -0.6533vw, 1.0864rem);
+  /* Step -1: 19.5556px → 13.3333px */
+  --step--1: clamp(0.8333rem, 1.4005rem + -0.6481vw, 1.2222rem);
+  /* Step 0: 22px → 16px */
+  --step-0: clamp(1rem, 1.5469rem + -0.625vw, 1.375rem);
+  /* Step 1: 24.75px → 19.2px */
+  --step-1: clamp(1.2rem, 1.7059rem + -0.5781vw, 1.5469rem);
+  /* Step 2: 27.8438px → 23.04px */
+  --step-2: clamp(1.44rem, 1.8778rem + -0.5004vw, 1.7402rem);
 
-  /* regarding fonts, this is one of the clearest I found: https://modern-fluid-typography.vercel.app/ */
+  /* @link https://utopia.fyi/space/calculator?c=360,22,1.5,1280,18,1.5,5,3,&s=0.75|0.5|0.25,1.5|2|3|4|6,s-l|l-s|3xs-l|2xs-m|xs-m|m-xl&g=s,l,xl,NaN */
+  --space-3xs: clamp(0.3125rem, 0.3995rem + -0.1087cqi, 0.375rem);
+  --space-2xs: clamp(0.5625rem, 0.7364rem + -0.2174cqi, 0.6875rem);
+  --space-xs: clamp(0.875rem, 1.1359rem + -0.3261cqi, 1.0625rem);
+  --space-s: clamp(1.125rem, 1.4728rem + -0.4348cqi, 1.375rem);
+  --space-m: clamp(1.6875rem, 2.2092rem + -0.6522cqi, 2.0625rem);
+  --space-l: clamp(2.25rem, 2.9457rem + -0.8696cqi, 2.75rem);
+  --space-xl: clamp(3.375rem, 4.4185rem + -1.3043cqi, 4.125rem);
+  --space-2xl: clamp(4.5rem, 5.8913rem + -1.7391cqi, 5.5rem);
+  --space-3xl: clamp(6.75rem, 8.837rem + -2.6087cqi, 8.25rem);
+
+  /* One-up pairs */
+  --space-3xs-2xs: clamp(0.375rem, 0.3016rem + 0.3261cqi, 0.5625rem);
+  --space-2xs-xs: clamp(0.6875rem, 0.6141rem + 0.3261cqi, 0.875rem);
+  --space-xs-s: clamp(1.0625rem, 1.038rem + 0.1087cqi, 1.125rem);
+  --space-s-m: clamp(1.375rem, 1.2527rem + 0.5435cqi, 1.6875rem);
+  --space-m-l: clamp(2.0625rem, 1.9891rem + 0.3261cqi, 2.25rem);
+  --space-l-xl: clamp(2.75rem, 2.5054rem + 1.087cqi, 3.375rem);
+  --space-xl-2xl: clamp(4.125rem, 3.9783rem + 0.6522cqi, 4.5rem);
+  --space-2xl-3xl: clamp(5.5rem, 5.0109rem + 2.1739cqi, 6.75rem);
+
+  /* Custom pairs */
+  --space-s-l: clamp(1.375rem, 1.0326rem + 1.5217cqi, 2.25rem);
+  --space-l-s: clamp(1.125rem, 3.3859rem + -2.8261cqi, 2.75rem);
+  --space-3xs-l: clamp(0.375rem, -0.3587rem + 3.2609cqi, 2.25rem);
+  --space-2xs-m: clamp(0.6875rem, 0.2962rem + 1.7391cqi, 1.6875rem);
+  --space-xs-m: clamp(1.0625rem, 0.8179rem + 1.087cqi, 1.6875rem);
+  --space-m-xl: clamp(2.0625rem, 1.5489rem + 2.2826cqi, 3.375rem);
+
+  /* Depends on container height */
+  --vspace-3xs: clamp(0.0625rem, -0.0375rem + 0.2cqb, 0.1875rem);
+  --vspace-2xs: clamp(0.1875rem, 0.0875rem + 0.2cqb, 0.3125rem);
+  --vspace-xs: clamp(0.25rem, 0.05rem + 0.4cqb, 0.5rem);
+  --vspace-s: clamp(0.3125rem, 0.0625rem + 0.5cqb, 0.625rem);
+  --vspace-m: clamp(0.5rem, 0.15rem + 0.7cqb, 0.9375rem);
+  --vspace-l: clamp(0.625rem, 0.125rem + 1cqb, 1.25rem);
+  --vspace-xl: clamp(0.9375rem, 0.1875rem + 1.5cqb, 1.875rem);
+  --vspace-2xl: clamp(1.25rem, 0.25rem + 2cqb, 2.5rem);
+  --vspace-3xl: clamp(1.875rem, 0.375rem + 3cqb, 3.75rem);
+
+
+  --label-height: 1.7lh;
+  --horizontal-spacing: clamp(1rem, 0.857rem + 0.714vw, 1.5rem);
+  --horizontal-margin: calc(var(--horizontal-spacing) / 2);
+  --vertical-spacing: clamp(0.5rem, 0.414rem + 0.429vw, 0.8rem);
+  --vertical-margin: calc(var(--vertical-spacing) / 2);
+  --popup-margin: 2vmax;
+  --popup-list-limit: clamp(22.222rem, calc(11.111rem + 50vw), 44.444rem);;
+
+  font-size: var(--step-0);
   &:has(body.desktop-mode) {
-    font-size: clamp(1rem, 1.68rem + -0.57vw, 1.4rem);
-    --quick-header-scale: clamp(0.8rem, 0.6rem + 0.4vw, 1.2rem);
-    --list-item-size: 1.2em;
+    --header-scale: var(--step-0);
+    --list-item-size: var(--step-0);
   }
 
   &:has(body.mobile-mode) {
-    font-size: clamp(2.5rem, 3vw + 1.7rem, 3.5rem);
-    --quick-header-scale: 1.3em;
-    --header-scale: clamp(1rem, -0.5vw + 1.25rem, 1.125rem);
-    --list-item-size: 1.6em;
+    --header-scale: var(--step-0);
+    --list-item-size: var(--step-1);
   }
 }
 
