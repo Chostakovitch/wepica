@@ -5,25 +5,22 @@
   border-radius: 50%;
   padding: 0.2em;
   font-size: 0.9em;
-  height: var(--label-height);
+  height: var(--space-m-l);
+  width: var(--space-m-l);
+  max-height: var(--space-m-l);
+  max-width: var(--space-m-l);
   align-items: center;
   justify-content: center;
   align-self: flex-start;
   color: #111;
   margin: 0 0.2ch;
+  overflow: hidden;
+  box-shadow: 0 0 0 2px #bfbfbf inset;
 }
 
-.js-select-initials {
-  justify-content: start;
-  p {
-    margin: 0;
-  }
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
 
 .member .avatar.avatar-image {
+  height: 100%;
   object-fit: cover;
   object-position: center;
 }
@@ -31,12 +28,11 @@
   background-color: #b3b3b3;
   border: 1px solid #fff;
   border-radius: 50%;
-  height: 1.2ch;
-  width: 1.2ch;
+  height: var(--space-2xs);
+  transform: translateX(var(--space-xs)) translateY(var(--space-xs));
+  aspect-ratio: 1/1;
   position: absolute;
-  transform: translate(1.6ch, 1.6ch);
   border: 1px solid #fff;
-  z-index: 15;
 }
 .member .member-presence-status.active {
   background: #64c464;
@@ -64,7 +60,6 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  box-shadow: 0 0 0 2px #bfbfbf inset;
 }
 .member.add-member:hover,
 .member.add-member.is-active {
@@ -80,17 +75,16 @@
 .atMention.me {
   background: #cfdfe8;
 }
+
 .mini-profile-info {
-  margin-top: 10px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  > .member {
+    align-self: center;
+  }
 }
-.mini-profile-info .info {
-  padding-top: 5px;
-}
-.mini-profile-info .info h3,
-.mini-profile-info .info p {
-  margin-bottom: 0;
-  padding-left: 0;
-}
-.mini-profile-info .info p {
-  padding-top: 0;
+
+.board-member-menu {
+  padding: 1ch;
 }
