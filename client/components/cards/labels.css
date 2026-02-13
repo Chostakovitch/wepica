@@ -140,6 +140,7 @@
   background-color: #4b0082;
 }
 .edit-labels-pop-over {
+  max-width: var(--popup-list-limit);
   display: grid;
   /* so that inner elements, align nicely */
   grid-template-columns: 1fr;

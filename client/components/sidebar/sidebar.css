@@ -27,7 +27,9 @@
   padding: 10px 10px 0px 10px;
 }
 .sidebar .sidebar-content {
-  padding: 0 1ch;
+  > *:not(hr) {
+    padding-inline: var(--horizontal-margin);
+  }
   >ul {
     display: flex;
   }

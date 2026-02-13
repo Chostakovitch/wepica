@@ -25,18 +25,24 @@ body.mobile-mode:has(.auth-container) {
     display: flex;
     flex: 1;
     justify-content: center;
+    position: relative;
+    img {
+      width: 100%;
+    }
   }
 }
 
-.auth-container {
-  flex: 1;
-  max-width: max(30vw, 600px);
-  gap: 1lh;
-  margin-bottom: 1lh;
-  max-height: 80vh;
-  position: relative;
+.at-form-lang {
+  padding-block: var(--vspace-s);
 }
 
+.at-form .at-error {
+  background: #ef9a9a;
+}
+
+#login-error-message {
+  text-align: center;
+}
 
 .auth-layout .auth-dialog {
   background: #fff;
@@ -53,13 +59,15 @@ body.mobile-mode:has(.auth-container) {
   &, div:not(#legalNoticeDiv, .lds-roller, .password-input-container, :empty), form {
     display: flex;
     flex-direction: column;
-    gap: 1lh;
     >:not(.at-input) {
       gap: 0.4lh;
     }
     .at-input {
       gap: 0;
     }
+  }
+  .at-title {
+    padding-block: var(--vspace-2xs);
   }
 
   *:not(div) {
@@ -76,6 +84,7 @@ body.mobile-mode:has(.auth-container) {
   display: grid;
   align-self: stretch;
   grid-template-columns: 1fr 6ch;
+  column-gap: var(--space-2xs);
 }
 
 body.mobile-mode {

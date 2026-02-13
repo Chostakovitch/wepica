@@ -278,33 +278,32 @@ textarea::-moz-placeholder {
 .links-controls {
   display: flex;
   align-items: center;
-  gap: 1ch;
+  justify-content: center;
+  gap: var(--space-3xs);
   button {
     display: flex;
     justify-content: center;
-
     align-items: center;
     align-self: center;
-    height: 2lh;
-    flex: 1;
+    border-radius: 0.6ch;
   }
 }
 
 .edit-controls {
   grid-area: main-controls;
+  grid-column: auto/-1;
 }
 
 .add-controls {
   grid-area: main-controls;
+  grid-column: auto/-1
 }
 
 .links-controls {
-  grid-area: links-controls
+  grid-area: links-controls;
+  font-size: var(--step--1);
 }
 
-.links-controls span.quiet {
-  margin: auto;
-}
 @media print {
   .add-controls {
     display: none;
@@ -805,5 +804,61 @@ button.loud-text-button:hover {
   .edit-controls .fa-times-thin,
   .add-controls .fa-times-thin {
     margin: 3px 20px;
+  }
+}
+.js-close-inlined-form > .fa-times-thin {
+  font-size: var(--step-1);
+}
+
+.rounded-fa-button:has(.fa) {
+  display: flex;
+  background-color: #dbdbdb;
+  aspect-ratio: 1 / 1;
+  border-radius: 50%;
+  font-size: 0.9em;
+  height: var(--step-1);
+  width: var(--step-1);
+  max-height: var(--step-1);
+  max-width: var(--step-1);
+  align-items: center;
+  justify-content: center;
+  align-self: flex-start;
+  color: #111;
+  overflow: hidden;
+  box-shadow: 0 0 0 2px #bfbfbf inset;
+}
+
+.add-element {
+  display: flex;
+  color: #a6a6a6;
+  flex: 1;
+  line-height: 1.2;
+  justify-content: center;
+  align-items: center;
+  align-self: center;
+  text-align: center;
+  z-index: 100;
+  height: 1.3lh;
+
+  &:hover {
+    opacity: 1;
+  }
+  .fa {
+    aspect-ratio: 1/1;
+    &:not(.fa-plus) {
+      font-size: var(--step-1);
+    }
+  }
+  .fa-plus {
+    align-self: start;
+    font-size: var(--step--2);
+  }
+}
+
+.fa-plus {
+  opacity: 0.6;
+  transition: 0.2s opacity ease-out;
+  &:hover {
+    opacity: 1;
   }
 }

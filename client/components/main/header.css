@@ -82,11 +82,12 @@
 #header #header-main-bar .board-header-btn.js-multiselection-active:hover {
   background: #0f3a5f;
 }
-#header #header-main-bar .separator {
-  border-left: 0.2ch solid rgba(255,255,255,0.3);
-  display: flex;
-  align-self: stretch;
-  flex: 0;
+
+@media (max-width: 1000px) {
+  .header-quick-access-list {
+    display: none !important;
+    visibility: none;
+  }
 }
 
 /* those are default values, some overriden from mobile below */
@@ -95,25 +96,28 @@
   transition: background-color 0.4s;
   background: #2573a7;
   padding: clamp(2vh, 0.5lh, 2%) 0.8rlh;
-  font-size: var(--quick-header-scale);
+  font-size: var(--step-1);
 
   /* the grid template is different for mobile */
   display: grid;
   grid-template-areas:
     "logo left right";
   grid-template-columns: 1fr 10fr auto;
-  justify-content: space-between;
-
-  gap: 2ch;
+  gap: var(--space-xs-m);
 
 
   #header-quick-access-left {
     display: flex;
     flex: 0;
     overflow-x: auto;
+    overflow-y: hidden;
     align-items: center;
     justify-content: start;
-    gap: 10ch;
+    color: #fff;
+    border-radius: var(--space-2xs);
+    transition: background-color 0.2s ease;
+    grid-area: left;
+    gap: var(--space-2xs-m);
   }
   .header-quick-access-list {
     display: flex;
@@ -282,14 +286,12 @@ body.mobile-mode {
   color: #f2f2f2;
 }
 #header-quick-access ul.header-quick-access-list li.current.empty {
-  padding: 12px 10px 12px 10px;
   flex: 1;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
   cursor: default;
   opacity: 0.85;
   font-style: italic;
+  font-size: var(--space-xs);
+  --overflow-lines: 2;
 }
 #header-quick-access ul.header-quick-access-list li:first-child .fa-home,
 #header-quick-access ul.header-quick-access-list li:nth-child(3) .fa-globe {
@@ -311,18 +313,7 @@ body.mobile-mode {
 }
 
 #header {
-  font-size: var(--header-scale);
   padding: 0.2lh 1ch;
-}
-
-
-#header-quick-access #header-user-bar .header-user-bar-name i.fa-chevron-down {
-  margin-right: 4px;
-}
-#header-quick-access #header-new-board-icon {
-  flex-grow: 1;
-  margin: 6px 5px 0;
-  width: 12px;
 }
 
 @media print {

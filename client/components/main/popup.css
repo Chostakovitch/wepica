@@ -61,11 +61,11 @@
   justify-content: space-between;
   gap: 1ch;
   align-items: center;
-  padding: 1ch;
-  background: #f7f7f7;
+  padding-inline: var(--space-xs);
+  padding-block: var(--vspace-s);
   border-bottom: 1px solid #dcdcdc;
   color: #666;
-  min-height: 2lh;
+  min-height: 1.5lh;
 }
 .pop-over .header .header-title {
   display: flex;
@@ -73,7 +73,7 @@
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
-  font-size: 1.2em;
+  font-size: var(--step-0);
   flex: 1;
   cursor: grab !important;
 }
@@ -129,11 +129,8 @@
 
 body.mobile-mode  {
   .popup-drag-handle, .close-btn {
-    font-size: 1.4em;
+    font-size: var(--step-0);
     align-self: center;
-  }
-  .pop-over:has(.pop-over-list) {
-    min-width: 70vw;
   }
 }
 
@@ -261,17 +258,17 @@ body.mobile-mode  {
 .pop-over-list li > a .sub-name {
   color: #8c8c8c;
   display: block;
-  font-size: 0.8em;
+  font-size: var(--step--1);
   font-weight: 400;
   line-height: 1.2em;
 }
-.pop-over-list li > a.current {
+.pop-over-list li:has(a.current) {
   background-color: #e2e6e9;
 }
-.pop-over-list li > a:active {
+.pop-over-list li:has(a:active) {
   background-color: #2e85b8;
 }
-.pop-over-list li > a.disabled {
+.pop-over-list li:has(a.disabled) {
   color: #8c8c8c;
   cursor: default;
 }
@@ -281,11 +278,11 @@ body.mobile-mode  {
 .pop-over-list li > a.disabled:hover {
   background: none;
 }
-.pop-over-list li > a.disabled:hover .sub-name,
-.pop-over-list li > a.disabled:hover .quiet {
+.pop-over-list li:has(a.disabled:hover .sub-name),
+.pop-over-list li:has(a.disabled:hover .quiet) {
   color: #8c8c8c;
 }
-.pop-over-list li > a.disabled:active {
+.pop-over-list li:has(a.disabled:active) {
   background: none;
 }
 .pop-over-list.inset li > a {

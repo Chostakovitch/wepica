@@ -69,12 +69,7 @@ Later it could be useful to use a CSS superset */
   --vspace-2xl: clamp(1.25rem, 0.25rem + 2cqb, 2.5rem);
   --vspace-3xl: clamp(1.875rem, 0.375rem + 3cqb, 3.75rem);
 
-
   --label-height: 1.7lh;
-  --horizontal-spacing: clamp(1rem, 0.857rem + 0.714vw, 1.5rem);
-  --horizontal-margin: calc(var(--horizontal-spacing) / 2);
-  --vertical-spacing: clamp(0.5rem, 0.414rem + 0.429vw, 0.8rem);
-  --vertical-margin: calc(var(--vertical-spacing) / 2);
   --popup-margin: 2vmax;
   --popup-list-limit: clamp(22.222rem, calc(11.111rem + 50vw), 44.444rem);;
 
@@ -193,15 +188,38 @@ body:has(.pop-over:hover) {
 }
 
 /* Some forms will need extra adjustement (removing margins, etc)
-but it worth it to let browsers take care of exact placement/sizing */
+but it makes a reasonable default */
 .inlined-form {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  align-items: stretch;
+  background: #f7f7f7;
+  display: grid;
+  grid-auto-flow: dense;
   justify-content: center;
-  gap: 0.3lh;
-  width: 100%;
+  justify-items: stretch;
+  align-items: center;
+  align-content: end;
+  grid-auto-columns: max-content;
+  grid-template-areas:
+    "....."
+    "main-controls";
+  gap: var(--vspace-s) var(--space-s);
+  padding: var(--vspace-s) var(--space-s);
+  z-index: 100;
+}
+
+button,
+input,
+select,
+.btn,
+.js-toggle,
+.js-color-choice,
+.js-reaction,
+.close {
+  min-height: var(--space-m);
+  font-size: inherit;
+}
+
+input[type="number"] {
+  width: 7ch;
 }
 
 #content {
@@ -294,8 +312,9 @@ p.quiet:not:has(span) {
   color: #aa8f09;
 }
 .small {
-  font-size: 0.8em;
+  font-size: var(--step--1);
 }
+
 a {
   color: inherit;
   cursor: pointer;

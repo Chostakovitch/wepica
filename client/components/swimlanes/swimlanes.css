@@ -73,9 +73,9 @@ body.mobile-mode .swimlane {
 
 .swimlane {
   .swimlane-header-menu-right, .swimlane-header-menu-left {
-    display: inline-flex;
-    align-content: center;
-    gap: 2ch;
+    display: flex;
+    align-items: center;
+    gap: var(--space-l-s);
   }
   /* can't resize beyond that point, but resizing screen causes
   overflow, which is great because lists would shrink too much otherwise */
