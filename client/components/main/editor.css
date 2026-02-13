@@ -9,8 +9,10 @@
   justify-content: end;
   grid-area: editor-controls;
   align-items: center;
-  align-self: start;
   gap: 1ch;
+  flex: 1;
+  align-self: stretch;
+  justify-self: center;
 }
 
 .editor {

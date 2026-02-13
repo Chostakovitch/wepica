@@ -358,7 +358,9 @@ body.mobile-mode .boards-layout {
 .board-list li.starred .is-star-active,
 .board-list li.starred .is-not-star-active {
   opacity: 1;
-  color: #ffd700;
+  i.fa-star {
+    color: #ffd700;
+  }
 }
 /* Show star icon on hover even for non-starred boards */
 .board-list li:hover .is-star-active,
@@ -370,7 +372,7 @@ body.mobile-mode .boards-layout {
     display: flex;
     overflow: hidden;
     background-color: inherit;
-    min-height: 4lh !important;
+    min-height: 5lh !important;
     min-width: min-content;
     height: 100%;
     /* Inherit board color from parent li.js-board */

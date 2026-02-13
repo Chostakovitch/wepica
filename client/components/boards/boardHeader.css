@@ -72,7 +72,7 @@ body {
   display: flex;
   align-self: center;
   align-items: center;
-  justify-content: center;
+  justify-content: stretch;
   gap: 1ch;
   & p {
     margin: 0;
@@ -97,7 +97,7 @@ body.mobile-mode {
     grid-template-columns: repeat(auto-fit, 1fr);
     flex: 1;
     gap: 1ch;
-    justify-content: start;
+    justify-content: center;
     align-items: center;
   }
 }

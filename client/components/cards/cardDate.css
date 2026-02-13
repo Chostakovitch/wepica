@@ -1,3 +1,6 @@
+.card-details-canvas {
+  margin: 0 !important;
+}
 .card-date {
   display: block;
   padding: 1px 3px;

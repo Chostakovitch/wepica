@@ -162,18 +162,6 @@ textarea.js-edit-checklist-item {
 .add-checklist.js-open-inlined-form {
   display: inline-block;
 }
-.add-checklist-item.js-open-inlined-form:hover,
-.add-checklist.js-open-inlined-form:hover {
-  background: #dbdbdb;
-  color: #222;
-  box-shadow: 0 1px 2px rgba(0,0,0,0.2);
-}
-
-.add-checklist-top.js-open-inlined-form:hover {
-  background: #dbdbdb;
-  color: #222;
-  box-shadow: 0 1px 2px rgba(0,0,0,.2);
-}
 
 .edit-controls label.toggle-label {
   margin-left: 2px;

@@ -47,9 +47,10 @@
   grid-template-areas:
     "editor editor editor editor"
     "main-controls main-controls link-controls editor-controls";
-  grid-auto-columns: 1fr;
+  grid-template-columns: 1fr 1fr auto auto;
   grid-auto-rows: min-content;
-  align-items: center;
+  align-items: stretch;
+  justify-content: space-between;
   flex: 1;
   gap: 0.3lh;
 }
