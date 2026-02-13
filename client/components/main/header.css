@@ -25,13 +25,6 @@
 #header #header-main-bar h1 .back-btn {
   margin-right: 10px;
 }
-#header #header-main-bar .wekan-logo {
-  margin: 3px auto auto;
-  width: 97px;
-  opacity: 0.6;
-  transition: opacity 0.15s;
-  float: right;
-}
 #header #header-main-bar .wekan-logo:hover {
   opacity: 0.9;
 }
@@ -42,6 +35,7 @@
   column-gap: 0.5ch;
   justify-content: center;
   overflow: hidden;
+  align-items: center;
   text-align: center;
 }
 #header #header-main-bar .board-header-btn i.fa {
@@ -89,7 +83,6 @@
     visibility: none;
   }
 }
-
 /* those are default values, some overriden from mobile below */
 #header-quick-access {
   color: #fff;
@@ -147,8 +140,9 @@
     height: 0;
     a, img {
       display: flex;
-      align-self: stretch;
       width: auto;
+      /* but don't do this; for small images, will be pixelated
+      align-self: stretch; */
     }
   }
   #header-quick-access-right {
@@ -162,18 +156,6 @@
     justify-content: start;
     align-items: center;
     gap: 1ch;
-  }
-
-  #header-quick-access-left {
-    grid-area: left;
-    display: grid;
-    text-decoration: none;
-    color: #fff;
-    border-radius: 0.4ch;
-    transition: background-color 0.2s ease;
-    gap: 2ch;
-    grid-auto-flow: column;
-
   }
 }
 
@@ -197,6 +179,10 @@ body.mobile-mode {
     }
   }
 
+  .board-header-btn {
+    flex: 1;
+  }
+
   .separator {
     display: none !important;
   }
@@ -211,10 +197,10 @@ body.mobile-mode {
 #header-quick-access.mobile-view .header-quick-access-list {
   display: none;
 }
-#header-quick-access .home-icon {
-  display: flex;
-  /* prevents wrap */
-  flex-shrink: 0;
+#header-quick-access {
+  .home-icon {
+    display: flex;
+  }
 }
 
 #header-quick-access .home-icon a:hover {
@@ -351,4 +337,5 @@ body.mobile-mode {
   visibility: hidden;
   flex: 1;
   align-items: center;
+  justify-content: center;
 }

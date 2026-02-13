@@ -67,7 +67,7 @@ Template.header.helpers({
 });
 
 Template.header.events({
-  'click .js-create-board': Popup.open('headerBarCreateBoard'),
+  'click .js-create-board'(evt) {Popup.open('createBoard')(evt)},
   'click .js-open-bookmarks'(evt) {
     // Already added but ensure single definition -- safe guard
   },
