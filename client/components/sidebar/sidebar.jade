@@ -17,7 +17,7 @@ template(name="sidebar")
           i.fa.fa-universal-access
           span {{_ 'accessibility'}}
       a.sidebar-xmark.js-close-sidebar &#10005;
-    .sidebar-content.js-board-sidebar-content
+    .sidebar-content.js-board-sidebar-content.pad
       //a.hide-btn.js-hide-sidebar
       //  i.fa.fa-navicon
       unless isDefaultView
@@ -193,270 +193,219 @@ template(name="boardInfoOnMyBoardsPopup")
             | {{_ 'show-board_members-avatar'}}
 
 template(name="boardCardSettingsPopup")
-  form.board-card-settings
-    .card-settings-grid
-      .card-settings-column
+  form.board-card-settings.table-grid
+    .card-settings-header.row
         h4 {{_ 'show-on-card'}}
-      .card-settings-column
         h4 {{_ 'show-on-minicard'}}
-      .card-settings-column
         h4 {{_ 'description'}}
-    .card-settings-row
-      .card-settings-column
+    hr
+    .card-settings-row.row
         a.flex.js-field-has-receiveddate(title="{{_ 'card-received'}}" class="{{#if allowsReceivedDate}}is-checked{{/if}}")
           i.fa(class="{{#if allowsReceivedDate}}fa-check{{else}}fa-square-o{{/if}}")
-      .card-settings-column
         a.flex.js-field-has-receiveddate(title="{{_ 'card-received'}}" class="{{#if allowsReceivedDate}}is-checked{{/if}}")
           i.fa(class="{{#if allowsReceivedDate}}fa-check{{else}}fa-square-o{{/if}}")
-      .card-settings-column
         span
           i.fa.fa-sign-in
           | {{_ 'card-received'}}
-    .card-settings-row
-      .card-settings-column
+    hr
+    .card-settings-row.row
         a.flex.js-field-has-startdate(title="{{_ 'card-start'}}" class="{{#if allowsStartDate}}is-checked{{/if}}")
           i.fa(class="{{#if allowsStartDate}}fa-check{{else}}fa-square-o{{/if}}")
-      .card-settings-column
         a.flex.js-field-has-startdate(title="{{_ 'card-start'}}" class="{{#if allowsStartDate}}is-checked{{/if}}")
           i.fa(class="{{#if allowsStartDate}}fa-check{{else}}fa-square-o{{/if}}")
-      .card-settings-column
         span
           i.fa.fa-hourglass
           | {{_ 'card-start'}}
-    .card-settings-row
-      .card-settings-column
+    hr
+    .card-settings-row.row
         a.flex.js-field-has-duedate(title="{{_ 'card-due'}}" class="{{#if allowsDueDate}}is-checked{{/if}}")
           i.fa(class="{{#if allowsDueDate}}fa-check{{else}}fa-square-o{{/if}}")
-      .card-settings-column
         a.flex.js-field-has-duedate(title="{{_ 'card-due'}}" class="{{#if allowsDueDate}}is-checked{{/if}}")
           i.fa(class="{{#if allowsDueDate}}fa-check{{else}}fa-square-o{{/if}}")
-      .card-settings-column
         span
           i.fa.fa-sign-in
           | {{_ 'card-due'}}
-    .card-settings-row
-      .card-settings-column
+    hr
+    .card-settings-row.row
         a.flex.js-field-has-enddate(title="{{_ 'card-end'}}" class="{{#if allowsEndDate}}is-checked{{/if}}")
           i.fa(class="{{#if allowsEndDate}}fa-check{{else}}fa-square-o{{/if}}")
-      .card-settings-column
         a.flex.js-field-has-enddate(title="{{_ 'card-end'}}" class="{{#if allowsEndDate}}is-checked{{/if}}")
           i.fa(class="{{#if allowsEndDate}}fa-check{{else}}fa-square-o{{/if}}")
-      .card-settings-column
         span
           i.fa.fa-clock-o
           | {{_ 'card-end'}}
-    .card-settings-row
-      .card-settings-column
+    hr
+    .card-settings-row.row
         a.flex.js-field-has-members(title="{{_ 'members'}}" class="{{#if allowsMembers}}is-checked{{/if}}")
           i.fa(class="{{#if allowsMembers}}fa-check{{else}}fa-square-o{{/if}}")
-      .card-settings-column
         a.flex.js-field-has-members(title="{{_ 'members'}}" class="{{#if allowsMembers}}is-checked{{/if}}")
           i.fa(class="{{#if allowsMembers}}fa-check{{else}}fa-square-o{{/if}}")
-      .card-settings-column
         span
           i.fa.fa-users
           | {{_ 'members'}}
-    .card-settings-row
-      .card-settings-column
+    hr
+    .card-settings-row.row
         a.flex.js-field-has-creator(title="{{_ 'creator'}}" class="{{#if allowsCreator}}is-checked{{/if}}")
           i.fa(class="{{#if allowsCreator}}fa-check{{else}}fa-square-o{{/if}}")
-      .card-settings-column
         span
-      .card-settings-column
         span
           i.fa.fa-user
           | {{_ 'creator'}}
-    .card-settings-row
-      .card-settings-column
+    hr
+    .card-settings-row.row
         span
-      .card-settings-column
         a.flex.js-field-has-creator-on-minicard(title="{{_ 'creator-on-minicard'}}" class="{{#if allowsCreatorOnMinicard}}is-checked{{/if}}")
           i.fa(class="{{#if allowsCreatorOnMinicard}}fa-check{{else}}fa-square-o{{/if}}")
-      .card-settings-column
         span
           i.fa.fa-user
           | {{_ 'creator-on-minicard'}}
-    .card-settings-row
-      .card-settings-column
+    hr
+    .card-settings-row.row
         a.flex.js-field-has-assignee(title="{{_ 'assignee'}}" class="{{#if allowsAssignee}}is-checked{{/if}}")
           i.fa(class="{{#if allowsAssignee}}fa-check{{else}}fa-square-o{{/if}}")
-      .card-settings-column
         a.flex.js-field-has-assignee(title="{{_ 'assignee'}}" class="{{#if allowsAssignee}}is-checked{{/if}}")
           i.fa(class="{{#if allowsAssignee}}fa-check{{else}}fa-square-o{{/if}}")
-      .card-settings-column
         span
           i.fa.fa-user
           | {{_ 'assignee'}}
-    .card-settings-row
-      .card-settings-column
+    hr
+    .card-settings-row.row
         a.flex.js-field-has-assigned-by(title="{{_ 'assigned-by'}}" class="{{#if allowsAssignedBy}}is-checked{{/if}}")
           i.fa(class="{{#if allowsAssignedBy}}fa-check{{else}}fa-square-o{{/if}}")
-      .card-settings-column
         a.flex.js-field-has-assigned-by(title="{{_ 'assigned-by'}}" class="{{#if allowsAssignedBy}}is-checked{{/if}}")
           i.fa(class="{{#if allowsAssignedBy}}fa-check{{else}}fa-square-o{{/if}}")
-      .card-settings-column
         span
           i.fa.fa-shopping-cart
           | {{_ 'assigned-by'}}
-    .card-settings-row
-      .card-settings-column
+    hr
+    .card-settings-row.row
         a.flex.js-field-has-requested-by(title="{{_ 'requested-by'}}" class="{{#if allowsRequestedBy}}is-checked{{/if}}")
           i.fa(class="{{#if allowsRequestedBy}}fa-check{{else}}fa-square-o{{/if}}")
-      .card-settings-column
         a.flex.js-field-has-requested-by(title="{{_ 'requested-by'}}" class="{{#if allowsRequestedBy}}is-checked{{/if}}")
           i.fa(class="{{#if allowsRequestedBy}}fa-check{{else}}fa-square-o{{/if}}")
-      .card-settings-column
         span
           i.fa.fa-user
           i.fa.fa-plus
           | {{_ 'requested-by'}}
-    .card-settings-row
-      .card-settings-column
+    hr
+    .card-settings-row.row
         a.flex.js-field-has-card-sorting-by-number(title="{{_ 'card-sorting-by-number'}}" class="{{#if allowsCardSortingByNumber}}is-checked{{/if}}")
           i.fa(class="{{#if allowsCardSortingByNumber}}fa-check{{else}}fa-square-o{{/if}}")
-      .card-settings-column
         span
-      .card-settings-column
         span
           i.fa.fa-sort-numeric-asc
           | {{_ 'card-sorting-by-number'}}
-    .card-settings-row
-      .card-settings-column
+    hr
+    .card-settings-row.row
         span
-      .card-settings-column
         a.flex.js-field-has-card-sorting-by-number-on-minicard(title="{{_ 'card-sorting-by-number-on-minicard'}}" class="{{#if allowsCardSortingByNumberOnMinicard}}is-checked{{/if}}")
           i.fa(class="{{#if allowsCardSortingByNumberOnMinicard}}fa-check{{else}}fa-square-o{{/if}}")
-      .card-settings-column
         span
           i.fa.fa-sort-numeric-asc
           | {{_ 'card-sorting-by-number-on-minicard'}}
-    .card-settings-row
-      .card-settings-column
+    hr
+    .card-settings-row.row
         a.flex.js-field-has-card-show-lists(title="{{_ 'card-show-lists'}}" class="{{#if allowsShowLists}}is-checked{{/if}}")
           i.fa(class="{{#if allowsShowLists}}fa-check{{else}}fa-square-o{{/if}}")
-      .card-settings-column
         span
-      .card-settings-column
         span
           i.fa.fa-list
           | {{_ 'card-show-lists'}}
-    .card-settings-row
-      .card-settings-column
+    hr
+    .card-settings-row.row
         a.flex.js-field-has-labels(title="{{_ 'labels'}}" class="{{#if allowsLabels}}is-checked{{/if}}")
           i.fa(class="{{#if allowsLabels}}fa-check{{else}}fa-square-o{{/if}}")
-      .card-settings-column
         a.flex.js-field-has-labels(title="{{_ 'labels'}}" class="{{#if allowsLabels}}is-checked{{/if}}")
           i.fa(class="{{#if allowsLabels}}fa-check{{else}}fa-square-o{{/if}}")
-      .card-settings-column
         span
           i.fa.fa-tag
           | {{_ 'labels'}}
-    .card-settings-row
-      .card-settings-column
+    hr
+    .card-settings-row.row
         span
-      .card-settings-column
         a.flex.js-field-has-card-show-lists-on-minicard(title="{{_ 'card-show-lists-on-minicard'}}" class="{{#if allowsShowListsOnMinicard}}is-checked{{/if}}")
           i.fa(class="{{#if allowsShowListsOnMinicard}}fa-check{{else}}fa-square-o{{/if}}")
-      .card-settings-column
         span
           i.fa.fa-list
           | {{_ 'card-show-lists-on-minicard'}}
-    .card-settings-row
-      .card-settings-column
+    hr
+    .card-settings-row.row
         a.flex.js-field-has-card-number(title="{{_ 'card'}} {{_ 'number'}}" class="{{#if allowsCardNumber}}is-checked{{/if}}")
           i.fa(class="{{#if allowsCardNumber}}fa-check{{else}}fa-square-o{{/if}}")
-      .card-settings-column
         a.flex.js-field-has-card-number(title="{{_ 'card'}} {{_ 'number'}}" class="{{#if allowsCardNumber}}is-checked{{/if}}")
           i.fa(class="{{#if allowsCardNumber}}fa-check{{else}}fa-square-o{{/if}}")
-      .card-settings-column
         span
           | #️⃣
           | {{_ 'card'}}
           | {{_ 'number'}}
-    .card-settings-row
-      .card-settings-column
+    hr
+    .card-settings-row.row
         a.flex.js-field-has-description-title(title="{{_ 'description'}} {{_ 'title'}}" class="{{#if allowsDescriptionTitle}}is-checked{{/if}}")
           i.fa(class="{{#if allowsDescriptionTitle}}fa-check{{else}}fa-square-o{{/if}}")
-      .card-settings-column
         a.flex.js-field-has-description-title(title="{{_ 'description'}} {{_ 'title'}}" class="{{#if allowsDescriptionTitle}}is-checked{{/if}}")
           i.fa(class="{{#if allowsDescriptionTitle}}fa-check{{else}}fa-square-o{{/if}}")
-      .card-settings-column
         span
           i.fa.fa-file-text-o
           | {{_ 'description'}}
           | {{_ 'title'}}
-    .card-settings-row
-      .card-settings-column
+    hr
+    .card-settings-row.row
         a.flex.js-field-has-description-text(title="{{_ 'description'}} {{_ 'custom-field-text'}}" class="{{#if allowsDescriptionText}}is-checked{{/if}}")
           i.fa(class="{{#if allowsDescriptionText}}fa-check{{else}}fa-square-o{{/if}}")
-      .card-settings-column
         a.flex.js-field-has-description-text(title="{{_ 'description'}} {{_ 'custom-field-text'}}" class="{{#if allowsDescriptionText}}is-checked{{/if}}")
           i.fa(class="{{#if allowsDescriptionText}}fa-check{{else}}fa-square-o{{/if}}")
-      .card-settings-column
         span
           i.fa.fa-file-text-o
           | {{_ 'description'}}
           | {{_ 'custom-field-text'}}
-    .card-settings-row
-      .card-settings-column
+    hr
+    .card-settings-row.row
         span
-      .card-settings-column
         a.flex.js-field-has-description-text-on-minicard(title="{{_ 'description-on-minicard'}}" class="{{#if allowsDescriptionTextOnMinicard}}is-checked{{/if}}")
           i.fa(class="{{#if allowsDescriptionTextOnMinicard}}fa-check{{else}}fa-square-o{{/if}}")
-      .card-settings-column
         span
           i.fa.fa-file-text-o
           | {{_ 'description-on-minicard'}}
-    .card-settings-row
-      .card-settings-column
+    hr
+    .card-settings-row.row
         a.flex.js-field-has-checklists(title="{{_ 'checklists'}}" class="{{#if allowsChecklists}}is-checked{{/if}}")
           i.fa(class="{{#if allowsChecklists}}fa-check{{else}}fa-square-o{{/if}}")
-      .card-settings-column
         a.flex.js-field-has-checklists(title="{{_ 'checklists'}}" class="{{#if allowsChecklists}}is-checked{{/if}}")
           i.fa(class="{{#if allowsChecklists}}fa-check{{else}}fa-square-o{{/if}}")
-      .card-settings-column
         span
           i.fa.fa-check
           | {{_ 'checklists'}}
-    .card-settings-row
-      .card-settings-column
+    hr
+    .card-settings-row.row
         a.flex.js-field-has-subtasks(title="{{_ 'subtasks'}}" class="{{#if allowsSubtasks}}is-checked{{/if}}")
           i.fa(class="{{#if allowsSubtasks}}fa-check{{else}}fa-square-o{{/if}}")
-      .card-settings-column
         a.flex.js-field-has-subtasks(title="{{_ 'subtasks'}}" class="{{#if allowsSubtasks}}is-checked{{/if}}")
           i.fa(class="{{#if allowsSubtasks}}fa-check{{else}}fa-square-o{{/if}}")
-      .card-settings-column
         span
           i.fa.fa-globe
           | {{_ 'subtasks'}}
-    .card-settings-row
-      .card-settings-column
+    hr
+    .card-settings-row.row
         a.flex.js-field-has-attachments(title="{{_ 'attachments'}}" class="{{#if allowsAttachments}}is-checked{{/if}}")
           i.fa(class="{{#if allowsAttachments}}fa-check{{else}}fa-square-o{{/if}}")
-      .card-settings-column
         a.flex.js-field-has-attachments(title="{{_ 'attachments'}}" class="{{#if allowsAttachments}}is-checked{{/if}}")
           i.fa(class="{{#if allowsAttachments}}fa-check{{else}}fa-square-o{{/if}}")
-      .card-settings-column
         span
           i.fa.fa-paperclip
           | {{_ 'attachments'}}
-    .card-settings-row
-      .card-settings-column
+    hr
+    .card-settings-row.row
         span
-      .card-settings-column
         a.flex.js-field-has-badge-attachment-on-minicard(title="{{_ 'badge-attachment-on-minicard'}}" class="{{#if allowsBadgeAttachmentOnMinicard}}is-checked{{/if}}")
           i.fa(class="{{#if allowsBadgeAttachmentOnMinicard}}fa-check{{else}}fa-square-o{{/if}}")
-      .card-settings-column
         span
           i.fa.fa-paperclip
           | {{_ 'badge-attachment-on-minicard'}}
-    .card-settings-row
-      .card-settings-column
+    hr
+    .card-settings-row.row
         span
-      .card-settings-column
         a.flex.js-field-has-cover-attachment-on-minicard(title="{{_ 'cover-attachment-on-minicard'}}" class="{{#if allowsCoverAttachmentOnMinicard}}is-checked{{/if}}")
           i.fa(class="{{#if allowsCoverAttachmentOnMinicard}}fa-check{{else}}fa-square-o{{/if}}")
-      .card-settings-column
         span
           i.fa.fa-picture-o
           | {{_ 'cover-attachment-on-minicard'}}
@@ -572,7 +521,7 @@ template(name="outgoingWebhooksPopup")
     input.primary.wide(type="submit" value="{{_ 'create'}}")
 
 template(name="boardMenuPopup")
-  ul.pop-over-list
+  ul.pop-over-list.table-grid
     if currentUser.isBoardAdmin
       li
         a.js-open-rules-view(title="{{_ 'rules'}}")
@@ -636,10 +585,6 @@ template(name="boardMenuPopup")
           a.js-archive-board
             i.fa.fa-archive
             | {{_ 'archive-board'}}
-  //- this popup is the only one to not open
-  //- with correct size; related to issue linked above ?
-  //- artificially add a bit a space
-  div.invisible-line
 
 template(name="exportBoard")
   ul.pop-over-list
