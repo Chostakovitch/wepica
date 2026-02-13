@@ -69,12 +69,7 @@ Later it could be useful to use a CSS superset */
   --vspace-2xl: clamp(1.25rem, 0.25rem + 2cqb, 2.5rem);
   --vspace-3xl: clamp(1.875rem, 0.375rem + 3cqb, 3.75rem);
 
-
   --label-height: 1.7lh;
-  --horizontal-spacing: clamp(1rem, 0.857rem + 0.714vw, 1.5rem);
-  --horizontal-margin: calc(var(--horizontal-spacing) / 2);
-  --vertical-spacing: clamp(0.5rem, 0.414rem + 0.429vw, 0.8rem);
-  --vertical-margin: calc(var(--vertical-spacing) / 2);
   --popup-margin: 2vmax;
   --popup-list-limit: clamp(22.222rem, calc(11.111rem + 50vw), 44.444rem);;
 
@@ -193,15 +188,38 @@ body:has(.pop-over:hover) {
 }
 
 /* Some forms will need extra adjustement (removing margins, etc)
-but it worth it to let browsers take care of exact placement/sizing */
+but it makes a reasonable default */
 .inlined-form {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  align-items: stretch;
+  background: #f7f7f7;
+  display: grid;
+  grid-auto-flow: dense;
   justify-content: center;
-  gap: 0.3lh;
-  width: 100%;
+  justify-items: stretch;
+  align-items: center;
+  align-content: end;
+  grid-auto-columns: max-content;
+  grid-template-areas:
+    "....."
+    "main-controls";
+  gap: var(--vspace-s) var(--space-s);
+  padding: var(--vspace-s) var(--space-s);
+  z-index: 100;
+}
+
+button,
+input,
+select,
+.btn,
+.js-toggle,
+.js-color-choice,
+.js-reaction,
+.close {
+  min-height: var(--space-m);
+  font-size: inherit;
+}
+
+input[type="number"] {
+  width: 7ch;
 }
 
 #content {
@@ -294,8 +312,9 @@ p.quiet:not:has(span) {
   color: #aa8f09;
 }
 .small {
-  font-size: 0.8em;
+  font-size: var(--step--1);
 }
+
 a {
   color: inherit;
   cursor: pointer;
@@ -341,14 +360,13 @@ blockquote {
   padding: 0 0 0 1vw;
 }
 hr {
-  height: 0.2ch;
-  border: 0;
+  min-height: 0.1em;
+  border: 0 !important;
   border: none;
-  width: 100%;
   background: #dbdbdb;
-  color: #dbdbdb;
-  margin: 0.2lh 0;
+  margin: 0;
   padding: 0;
+  z-index: 10;
 }
 table,
 td,
@@ -475,9 +493,6 @@ kbd {
 }
 .grabbing {
   cursor: grabbing;
-}
-.textcomplete-dropdown {
-  z-index: 2000 !important;
 }
 .fa.fa-times-thin:before {
   content: '\00d7';
@@ -637,15 +652,6 @@ a:not(.disabled).is-active i.fa {
     margin: 0 auto;
   }
 
-  /* Improve touch targets */
-  button, .btn, .js-toggle, .js-color-choice, .js-reaction, .close {
-    min-height: 44px;
-    min-width: 44px;
-    padding: 12px 16px;
-     /* Prevent zoom on iOS */
-    touch-action: manipulation;
-  }
-
   /* Form elements */
   input, select, textarea {
      /* Prevent zoom on iOS */
@@ -694,6 +700,14 @@ a:not(.disabled).is-active i.fa {
 
 /* Large displays and digital signage (1920px+) */
 @media screen and (min-width: 1920px) {
+  .minicard {
+    min-height: 56px;
+  }
+
+  .list {
+    min-width: 360px;
+  }
+
   .board-canvas {
     padding: 0;
   }
@@ -714,9 +728,6 @@ a:not(.disabled).is-active i.fa {
     width: 1000px;
   }
 
-  .setting-content .content-body {
-    gap: 32px;
-  }
 
   .setting-content .content-body .side-menu {
     width: 320px;
@@ -926,5 +937,94 @@ Prevents popups to compute real size, trying to comment
   }
   100% {
     transform: rotate(360deg);
+  }
+}
+
+.pad, .pop-over .content {
+  /* a way to pad everything but not hr or a certain class, even nested (up to a certain point)
+  this feels nice because background color, separators, hover animations, etc are full-width,
+  but content is padded. will does a decent job by default, but miss some configurations.
+  as selector have little specificity, padding/margin can be overriden easily.
+  padding-block like this is preferred over row-gap or padding-block on root element,
+  because it would prevent "full" children's background/hover to extend.
+
+  commented colors are useful to visualize/debug
+  */
+
+  /* those are siblings */
+  :is(hr, .full, .at-error) ~ *, *:has(~hr, full, .at-error) {
+    &:not(:has(hr, .full, .at-error)) {
+      padding-inline: var(--space-xs);
+      &:not(hr) {
+        padding-block: var(--vspace-xs);
+      }
+      /* background: rgba(255, 0, 0, 0.304); */
+    }
+  }
+  /* those are siblings of ancestors */
+  :not(:has(hr, .full, .at-error)), .full {
+    &:has(~ :is(hr, .full, .at-error)) {
+      padding-inline: var(--space-xs);
+      &:not(hr) {
+        padding-block: var(--vspace-xs);
+      }
+      /* background: rgba(0, 0, 255, 0.339); */
+    }
+  }
+
+  /* and when there is not full width element */
+  &:not(:has(:is(hr, .full, .at-error))) {
+    padding-inline: var(--space-xs);
+    &:not(hr) {
+      padding-block: var(--vspace-xs);
+    }
+    /* background: rgba(0, 128, 0, 0.34); */
+  }
+
+  /* they can be padded from "root" once, so background apply until borders */
+  .full, .at-error {
+    padding-inline: var(--space-xs);
+    padding-block: var(--vspace-xs);
+    /* background: rgba(238, 130, 238, 0.336); */
+  }
+
+  .full:is(:first-child, :last-child) {
+    border-radius: 0;
+    padding-block: var(--vspace-l);
+  }
+}
+
+.pop-over-list, .table-grid {
+  display: grid !important;
+  /* I am not a grid expert, but I think the number of columns is not
+  very important as their minimal size is 0. However for finer control,
+  you can set this variable for a specific layout.*/
+  grid-template-columns: var(--t-columns, repeat(var(--n-columns, 4), minmax(0, auto)));
+  /* no need to apply .row if structured with lists, or with ul>li>a>[actual row].
+  this last case is to try to adapt to a common structure out there, but we make sure
+  that content is inside `a` by using :only-child. */
+  * > :is(.row, li),
+  .row, li, li>:only-child {
+    display: grid !important;
+    /* subgrid just says to use the tracks of parent grid;
+    1/-1 makes the row span all columns. so we get a table effect,
+    except if number of colums are different across rows, but at least
+    first/last elements will be always aligned */
+    grid-template-columns: subgrid;
+    justify-items: start;
+    place-content: center;
+    column-gap: var(--space-s);
+    grid-column: 1/-1;
+    > {
+      display: grid;
+      grid-template-columns: subgrid;
+      grid-column: auto;
+      &:last-child {
+        grid-column: auto/-1;
+      }
+    }
+  }
+  hr, .full {
+    grid-column: 1/-1;
   }
 }

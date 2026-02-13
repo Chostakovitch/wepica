@@ -27,7 +27,6 @@
   padding: 10px 10px 0px 10px;
 }
 .sidebar .sidebar-content {
-  padding: 0 1ch;
   >ul {
     display: flex;
   }
@@ -88,39 +87,6 @@ body.grey-icons-enabled .boardSubtaskSettingsPopup .materialCheckBox.is-checked 
   border-right: 2px solid #7a7a7a !important;
 }
 
-/* Card Settings 3-column grid layout */
-.card-settings-grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr 2fr;
-  gap: 10px;
-  margin-bottom: 10px;
-}
-
-.card-settings-row {
-  display: grid;
-  grid-template-columns: 1fr 1fr 2fr;
-  gap: 10px;
-  align-items: center;
-  padding: 5px 0;
-  border-bottom: 1px solid #eee;
-}
-
-.card-settings-column {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.card-settings-column:last-child {
-  justify-content: flex-start;
-}
-
-.card-settings-column h4 {
-  margin: 0;
-
-  font-weight: bold;
-  text-align: center;
-}
 .sidebar .sidebar-content ul.sidebar-list li > a {
   display: flex;
   margin: 0;

@@ -2,50 +2,55 @@
   display: grid;
   align-content: stretch;
   align-items: stretch;
-  justify-items: stretch;
-  justify-content: center;
+  justify-items: center;
+  justify-content: stretch;
   padding: 2lh 0;
   /* i.e. center horizontally */
   margin-inline: auto;;
   /* parent container has relative positionning */
   grid-template-columns: 100%;
-  grid-template-rows: minmax(20vh, 300px) min-content 1fr;
+  grid-template-rows: 1fr auto auto;
+  max-width: clamp(20.625rem, 17.5862rem + 13.5057cqi, 50rem);
   position: relative;
 }
 
 body.mobile-mode:has(.auth-container) {
   .auth-container {
     grid-template-columns: 90vw;
-    min-height: 100%;
   }
 }
 
 .auth-logo {
+  min-width: 80%;
   &, &>a:not(img), > img {
     display: flex;
     flex: 1;
     justify-content: center;
+    position: relative;
+    img {
+      width: 100%;
+    }
   }
 }
 
-.auth-container {
-  flex: 1;
-  max-width: max(30vw, 600px);
-  gap: 1lh;
-  margin-bottom: 1lh;
-  max-height: 80vh;
-  position: relative;
+.at-form-lang {
+  padding-block: var(--vspace-s);
 }
 
+.at-form .at-error {
+  background: #ef9a9a;
+}
+
+#login-error-message {
+  text-align: center;
+}
 
 .auth-layout .auth-dialog {
   background: #fff;
-  font-size: 1.1em;
   border-radius: 0.4vw;
   border: 1px solid #dbdbdb;
   border-bottom-color: #c2c2c2;
   box-shadow: 0 0.2vh 0.8vh rgba(0,0,0,0.3);
-  padding: 0 2ch 0.5lh 2ch;
   white-space: wrap;
   /* try to override properties of non-flex forms
   without referring too much to classes and ids, as forms
@@ -53,13 +58,15 @@ body.mobile-mode:has(.auth-container) {
   &, div:not(#legalNoticeDiv, .lds-roller, .password-input-container, :empty), form {
     display: flex;
     flex-direction: column;
-    gap: 1lh;
     >:not(.at-input) {
       gap: 0.4lh;
     }
     .at-input {
       gap: 0;
     }
+  }
+  .at-title {
+    padding-block: var(--vspace-2xs);
   }
 
   *:not(div) {
@@ -76,6 +83,7 @@ body.mobile-mode:has(.auth-container) {
   display: grid;
   align-self: stretch;
   grid-template-columns: 1fr 6ch;
+  column-gap: var(--space-2xs);
 }
 
 body.mobile-mode {
@@ -89,7 +97,6 @@ body.mobile-mode {
 .auth-layout .auth-dialog .at-form button {
   background: #216694;
   color: #fff;
-  min-height: 2lh;
 }
 .auth-layout .auth-dialog .at-form .at-title {
   border-bottom: 1px solid #dcdcdc;

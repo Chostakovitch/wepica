@@ -25,13 +25,6 @@
 #header #header-main-bar h1 .back-btn {
   margin-right: 10px;
 }
-#header #header-main-bar .wekan-logo {
-  margin: 3px auto auto;
-  width: 97px;
-  opacity: 0.6;
-  transition: opacity 0.15s;
-  float: right;
-}
 #header #header-main-bar .wekan-logo:hover {
   opacity: 0.9;
 }
@@ -42,6 +35,7 @@
   column-gap: 0.5ch;
   justify-content: center;
   overflow: hidden;
+  align-items: center;
   text-align: center;
 }
 #header #header-main-bar .board-header-btn i.fa {
@@ -82,38 +76,41 @@
 #header #header-main-bar .board-header-btn.js-multiselection-active:hover {
   background: #0f3a5f;
 }
-#header #header-main-bar .separator {
-  border-left: 0.2ch solid rgba(255,255,255,0.3);
-  display: flex;
-  align-self: stretch;
-  flex: 0;
-}
 
+@media (max-width: 1000px) {
+  .header-quick-access-list {
+    display: none !important;
+    visibility: none;
+  }
+}
 /* those are default values, some overriden from mobile below */
 #header-quick-access {
   color: #fff;
   transition: background-color 0.4s;
   background: #2573a7;
   padding: clamp(2vh, 0.5lh, 2%) 0.8rlh;
-  font-size: var(--quick-header-scale);
+  font-size: var(--step-1);
 
   /* the grid template is different for mobile */
   display: grid;
   grid-template-areas:
     "logo left right";
   grid-template-columns: 1fr 10fr auto;
-  justify-content: space-between;
-
-  gap: 2ch;
+  gap: var(--space-xs-m);
 
 
   #header-quick-access-left {
     display: flex;
     flex: 0;
     overflow-x: auto;
+    overflow-y: hidden;
     align-items: center;
     justify-content: start;
-    gap: 10ch;
+    color: #fff;
+    border-radius: var(--space-2xs);
+    transition: background-color 0.2s ease;
+    grid-area: left;
+    gap: var(--space-2xs-m);
   }
   .header-quick-access-list {
     display: flex;
@@ -143,8 +140,9 @@
     height: 0;
     a, img {
       display: flex;
-      align-self: stretch;
       width: auto;
+      /* but don't do this; for small images, will be pixelated
+      align-self: stretch; */
     }
   }
   #header-quick-access-right {
@@ -158,18 +156,6 @@
     justify-content: start;
     align-items: center;
     gap: 1ch;
-  }
-
-  #header-quick-access-left {
-    grid-area: left;
-    display: grid;
-    text-decoration: none;
-    color: #fff;
-    border-radius: 0.4ch;
-    transition: background-color 0.2s ease;
-    gap: 2ch;
-    grid-auto-flow: column;
-
   }
 }
 
@@ -193,6 +179,10 @@ body.mobile-mode {
     }
   }
 
+  .board-header-btn {
+    flex: 1;
+  }
+
   .separator {
     display: none !important;
   }
@@ -207,10 +197,10 @@ body.mobile-mode {
 #header-quick-access.mobile-view .header-quick-access-list {
   display: none;
 }
-#header-quick-access .home-icon {
-  display: flex;
-  /* prevents wrap */
-  flex-shrink: 0;
+#header-quick-access {
+  .home-icon {
+    display: flex;
+  }
 }
 
 #header-quick-access .home-icon a:hover {
@@ -282,14 +272,12 @@ body.mobile-mode {
   color: #f2f2f2;
 }
 #header-quick-access ul.header-quick-access-list li.current.empty {
-  padding: 12px 10px 12px 10px;
   flex: 1;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
   cursor: default;
   opacity: 0.85;
   font-style: italic;
+  font-size: var(--space-xs);
+  --overflow-lines: 2;
 }
 #header-quick-access ul.header-quick-access-list li:first-child .fa-home,
 #header-quick-access ul.header-quick-access-list li:nth-child(3) .fa-globe {
@@ -311,18 +299,7 @@ body.mobile-mode {
 }
 
 #header {
-  font-size: var(--header-scale);
   padding: 0.2lh 1ch;
-}
-
-
-#header-quick-access #header-user-bar .header-user-bar-name i.fa-chevron-down {
-  margin-right: 4px;
-}
-#header-quick-access #header-new-board-icon {
-  flex-grow: 1;
-  margin: 6px 5px 0;
-  width: 12px;
 }
 
 @media print {
@@ -360,4 +337,5 @@ body.mobile-mode {
   visibility: hidden;
   flex: 1;
   align-items: center;
+  justify-content: center;
 }

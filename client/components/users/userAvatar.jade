@@ -88,33 +88,36 @@ template(name="changeAvatarPopup")
     .warning {{_ error.get}}
   ul.pop-over-list
     each uploadedAvatars
-      li: a.js-select-avatar
+      li: a.full.select-avatar.js-select-avatar
         .member
           img.avatar.avatar-image(src="{{link}}")
-        if isSelected
-          i.fa.fa-check
-          p.sub-name
-          a.js-delete-avatar {{_ 'delete'}}
-          |  -
+        p.sub-name
           = name
-    li: a.js-select-initials
+          if isSelected
+            i.fa.fa-check
+        a.js-delete-avatar
+          button.negate
+            | {{_ 'delete'}}
+    li: a.full.select-initials.js-select-initials
       .member
         +userAvatarInitials(userId=currentUser._id)
-      | {{_ 'initials' }}
-      if noAvatarUrl
-        i.fa.fa-check
-        p.sub-name {{_ 'default-avatar'}}
-  input.hide.js-upload-avatar-input(accept="image/*;capture=camera" type="file")
-  if Meteor.settings.public.avatarsUploadMaxSize
-    | {{_ 'max-avatar-filesize'}} {{Meteor.settings.public.avatarsUploadMaxSize}}
-    br
-  if Meteor.settings.public.avatarsUploadMimeTypes
-    | {{_ 'allowed-avatar-filetypes'}} {{Meteor.settings.public.avatarsUploadMimeTypes}}
-    br
-  | {{_ 'invalid-file'}}
-  button.full.js-upload-avatar
-    i.fa.fa-upload
-    | {{_ 'upload-avatar' }}
+      p
+        | {{_ 'initials' }}
+        if noAvatarUrl
+          i.fa.fa-check
+      p.sub-name {{_ 'default-avatar'}}
+    input.full.hide.js-upload-avatar-input(accept="image/*;capture=camera" type="file")
+    if Meteor.settings.public.avatarsUploadMaxSize
+      .pop-over-text.full
+        | {{_ 'max-avatar-filesize'}} {{Meteor.settings.public.avatarsUploadMaxSize}}
+    if Meteor.settings.public.avatarsUploadMimeTypes
+      .pop-over-text.full
+        | {{_ 'allowed-avatar-filetypes'}} {{Meteor.settings.public.avatarsUploadMimeTypes}}
+    .pop-over-text.full
+      | {{_ 'invalid-file'}}
+    button.primary.full.js-upload-avatar
+      i.fa.fa-upload
+      | {{_ 'upload-avatar' }}
 
 template(name="deleteAvatarPopup")
   p {{_ 'delete-avatar-confirm'}}

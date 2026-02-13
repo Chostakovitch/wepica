@@ -5,6 +5,7 @@ template(name="listHeader")
     +inlinedForm
       +editListTitleForm
     else
+      //- #FIXME seems like a lot of duplication
       if isMiniScreen
         if currentList
           a.list-header-left-icon.js-unselect-list

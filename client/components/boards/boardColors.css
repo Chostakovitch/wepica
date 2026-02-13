@@ -25,7 +25,7 @@ THEME - NEPHRITIS
   border-radius: 0.6ch;
 }
 
-.board-color-nephritis.pop-over .pop-over-list li a:not(.disabled):hover,
+.board-color-nephritis.pop-over .pop-over-list li:has(a:not(.disabled):hover),
 .board-color-nephritis .sidebar .sidebar-content .sidebar-btn:hover,
 .board-color-nephritis .sidebar-list li a:hover {
   background-color: #2cc66d;
@@ -144,7 +144,7 @@ THEME - Pomegranate
   border-radius: 0.6ch;
 }
 
-.board-color-pomegranate.pop-over .pop-over-list li a:not(.disabled):hover,
+.board-color-pomegranate.pop-over .pop-over-list li:has(a:not(.disabled):hover),
 .board-color-pomegranate .sidebar .sidebar-content .sidebar-btn:hover,
 .board-color-pomegranate .sidebar-list li a:hover {
   background-color: #d24435;
@@ -264,7 +264,7 @@ THEME - Belize
   color: #eee;
 }
 
-.board-color-belize.pop-over .pop-over-list li a:not(.disabled):hover,
+.board-color-belize.pop-over .pop-over-list li:has(a:not(.disabled):hover),
 .board-color-belize .sidebar .sidebar-content .sidebar-btn:hover,
 .board-color-belize .sidebar-list li a:hover {
   background-color: #2e90d0;
@@ -323,11 +323,9 @@ THEME - Belize
   background-color: #216694;
 }
 
-@media screen and (max-width: 800px) {
-  .board-color-belize.pop-over .header {
-    background: #2980b9;
-    color: #fff;
-  }
+.board-color-belize.pop-over .header {
+  background: #2980b9;
+  color: #fff;
 }
 
 .board-color-belize#header ul li.current,
@@ -381,7 +379,7 @@ THEME - Wisteria
   border-radius: 0.6ch;
 }
 
-.board-color-wisteria.pop-over .pop-over-list li a:not(.disabled):hover,
+.board-color-wisteria.pop-over .pop-over-list li:has(a:not(.disabled):hover),
 .board-color-wisteria .sidebar .sidebar-content .sidebar-btn:hover,
 .board-color-wisteria .sidebar-list li a:hover {
   background-color: #9c51bb;
@@ -500,7 +498,7 @@ THEME - Midnight
   border-radius: 0.6ch;
 }
 
-.board-color-midnight.pop-over .pop-over-list li a:not(.disabled):hover,
+.board-color-midnight.pop-over .pop-over-list li:has(a:not(.disabled):hover),
 .board-color-midnight .sidebar .sidebar-content .sidebar-btn:hover,
 .board-color-midnight .sidebar-list li a:hover {
   background-color: #3a5169;
@@ -619,7 +617,7 @@ THEME - Pumpkin
   border-radius: 0.6ch;
 }
 
-.board-color-pumpkin.pop-over .pop-over-list li a:not(.disabled):hover,
+.board-color-pumpkin.pop-over .pop-over-list li:has(a:not(.disabled):hover),
 .board-color-pumpkin .sidebar .sidebar-content .sidebar-btn:hover,
 .board-color-pumpkin .sidebar-list li a:hover {
   background-color: #e98b38;
@@ -738,7 +736,7 @@ THEME - Moderate Pink
   border-radius: 0.6ch;
 }
 
-.board-color-moderatepink.pop-over .pop-over-list li a:not(.disabled):hover,
+.board-color-moderatepink.pop-over .pop-over-list li:has(a:not(.disabled):hover),
 .board-color-moderatepink .sidebar .sidebar-content .sidebar-btn:hover,
 .board-color-moderatepink .sidebar-list li a:hover {
   background-color: #d26b9c;
@@ -857,7 +855,7 @@ THEME - Strong Cyan
   border-radius: 0.6ch;
 }
 
-.board-color-strongcyan.pop-over .pop-over-list li a:not(.disabled):hover,
+.board-color-strongcyan.pop-over .pop-over-list li:has(a:not(.disabled):hover),
 .board-color-strongcyan .sidebar .sidebar-content .sidebar-btn:hover,
 .board-color-strongcyan .sidebar-list li a:hover {
   background-color: #00c8eb;
@@ -976,7 +974,7 @@ THEME - Lime Green
   border-radius: 0.6ch;
 }
 
-.board-color-limegreen.pop-over .pop-over-list li a:not(.disabled):hover,
+.board-color-limegreen.pop-over .pop-over-list li:has(a:not(.disabled):hover),
 .board-color-limegreen .sidebar .sidebar-content .sidebar-btn:hover,
 .board-color-limegreen .sidebar-list li a:hover {
   background-color: #5dc57a;
@@ -1096,7 +1094,7 @@ THEME - Dark
   border-radius: 0.6ch;
 }
 
-.board-color-dark.pop-over .pop-over-list li a:not(.disabled):hover,
+.board-color-dark.pop-over .pop-over-list li:has(a:not(.disabled):hover),
 .board-color-dark .sidebar .sidebar-content .sidebar-btn:hover,
 .board-color-dark .sidebar-list li a:hover {
   background-color: #3a516a;
@@ -1338,7 +1336,7 @@ THEME - Relax
   border-radius: 0.6ch;
 }
 
-.board-color-relax.pop-over .pop-over-list li a:not(.disabled):hover,
+.board-color-relax.pop-over .pop-over-list li:has(a:not(.disabled):hover),
 .board-color-relax .sidebar .sidebar-content .sidebar-btn:hover,
 .board-color-relax .sidebar-list li a:hover {
   background-color: #2cc66f;
@@ -1488,7 +1486,7 @@ THEME - Corteza
     border-radius: 0.6ch;
   }
 
-  .board-color-corteza.pop-over .pop-over-list li a:not(.disabled):hover,
+  .board-color-corteza.pop-over .pop-over-list li:has(a:not(.disabled):hover),
   .board-color-corteza .sidebar .sidebar-content .sidebar-btn:hover,
   .board-color-corteza .sidebar-list li a:hover {
     background-color: #6597ad;
@@ -1593,7 +1591,7 @@ THEME - Clear Blue
 .board-color-clearblue .is-selected .minicard {
   border-left: 3px solid #499bea;
 }
-.board-color-clearblue.pop-over .pop-over-list li a:not(.disabled):hover,
+.board-color-clearblue.pop-over .pop-over-list li:has(a:not(.disabled):hover),
 .board-color-clearblue .sidebar .sidebar-content .sidebar-btn:hover,
 .board-color-clearblue .sidebar-list li a:hover {
   background-color: #5ba5ec;
@@ -1852,7 +1850,7 @@ THEME - Natural
     border-radius: 0.6ch;
   }
 
-  .board-color-natural.pop-over .pop-over-list li a:not(.disabled):hover,
+  .board-color-natural.pop-over .pop-over-list li:has(a:not(.disabled):hover),
   .board-color-natural .sidebar .sidebar-content .sidebar-btn:hover,
   .board-color-natural .sidebar-list li a:hover {
     background-color: #687666;
@@ -1992,7 +1990,7 @@ THEME - Modern
     }
   }
 
-  .board-color-modern.pop-over .pop-over-list li a:not(.disabled):hover,
+  .board-color-modern.pop-over .pop-over-list li:has(a:not(.disabled):hover),
   .board-color-modern .sidebar .sidebar-content .sidebar-btn:hover,
   .board-color-modern .sidebar-list li a:hover {
     background-color: #2f90cf;
@@ -2270,7 +2268,7 @@ THEME - Modern Dark
     border-radius: 0.6ch;
   }
 
-  .board-color-moderndark.pop-over .pop-over-list li a:not(.disabled):hover,
+  .board-color-moderndark.pop-over .pop-over-list li:has(a:not(.disabled):hover),
   .board-color-moderndark .sidebar .sidebar-content .sidebar-btn:hover,
   .board-color-moderndark .sidebar-list li a:hover {
     background-color: #3f3f3f;
@@ -2743,7 +2741,7 @@ THEME - Exodark
     border-radius: 0.6ch;
   }
 
-  .board-color-exodark.pop-over .pop-over-list li a:not(.disabled):hover,
+  .board-color-exodark.pop-over .pop-over-list li:has(a:not(.disabled):hover),
   .board-color-exodark .sidebar .sidebar-content .sidebar-btn:hover,
   .board-color-exodark .sidebar-list li a:hover {
     background-color: #383838;

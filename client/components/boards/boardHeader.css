@@ -72,7 +72,7 @@ body {
   display: flex;
   align-self: center;
   align-items: center;
-  justify-content: center;
+  justify-content: stretch;
   gap: 1ch;
   & p {
     margin: 0;
@@ -83,12 +83,10 @@ body {
   flex-wrap: no-wrap;
 }
 body.mobile-mode {
-  header-board-menu h1 {
-    font-size: 2em;
+  .header-board-menu {
+    font-size: var(--step-1);
   }
   .board-header-btn {
-    /* avoid wrapping if possible, at the cost of little icons */
-    font-size: 0.5em;
     /* no much choice because the way FA icons are inserted */
     padding-top: 0.1lh;
     min-height: 0.8lh;
@@ -99,7 +97,7 @@ body.mobile-mode {
     grid-template-columns: repeat(auto-fit, 1fr);
     flex: 1;
     gap: 1ch;
-    justify-content: start;
+    justify-content: center;
     align-items: center;
   }
 }

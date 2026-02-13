@@ -1,5 +1,5 @@
 .pop-over {
-  background: #ededed;
+  background: #fff;
   border-bottom-color: #c2c2c2;
   box-shadow: 0 0.2vh 0.8vh rgba(0, 0, 0, 0.3);
   /* so they can easily travel with mouse */
@@ -12,6 +12,9 @@
   resize: both;
   pointer-events: all;
   max-height: 100vh;
+  border-radius: var(--space-3xs);
+  /* minimum for popups, see component */
+  z-index: 10;
 
   .content-wrapper {
     width: auto;
@@ -20,7 +23,7 @@
     overflow-y: auto;
   }
 
-  .content-wrapper >* {
+  .content-wrapper > * {
     /* low specificity so that it can be transparently overriden,
     but could have side effects if no display is explicitely specific in inner content */
     display: flex;
@@ -31,49 +34,24 @@
   }
 }
 
-.pop-over a:has(.fa-plus)+ :not(*) {
-  min-height: 1.5lh;
-  aspect-ratio: 1/1;
-  display: flex;
-  justify-content: center;
-  margin-top: 0.2lh;
-}
-.pop-over hr {
-  margin: 0.3lh 0;
-  /* below everything in the same stacking context when
-  after, child or explicit z-index */
-  z-index: 0;
-}
-.pop-over  {
-  /* feels like it's too ad-hod */
-  input, a:not(.js-board-template, .member, .edit-avatar) {
-    display: flex;
-    align-items: center;
-    gap: 1ch;
-    min-height: 1.5lh;
-    display: flex;
-    flex: 1;
-  }
-}
-
 .pop-over .header {
   display: flex;
   justify-content: space-between;
   gap: 1ch;
   align-items: center;
-  padding: 1ch;
-  background: #f7f7f7;
+  padding-inline: var(--space-xs);
+  padding-block: var(--vspace-s);
   border-bottom: 1px solid #dcdcdc;
   color: #666;
-  min-height: 2lh;
+  min-height: 1.5lh;
 }
 .pop-over .header .header-title {
-  display: flex;
+  display: inline-block;
   font-weight: bold;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
-  font-size: 1.2em;
+  font-size: var(--step-0);
   flex: 1;
   cursor: grab !important;
 }
@@ -86,21 +64,30 @@
   width: 0;
 }
 
-.pop-over.no-title .header {
-  background: none;
+.close-btn {
+  aspect-ratio: 1/1;
+  display: flex;
+  justify-content: center;
 }
-
-.pop-over {
-  .content-wrapper, .header {
-    display: flex;
-    align-items: center;
-  }
-}
-
-.pop-over:has(.header) .content {
-  /* inner content has full width available,
-  so it is also responsive for margins, sizes, etc */
+.pop-over .content {
   overflow-y: auto;
+  font-size: var(--step-0);
+
+  .pop-over-text {
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 3;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  /* try to catch all small settings/info popups  */
+  & > form, .at-form {
+    gap: var(--vspace-2xs);
+    button.submit {
+      margin-block: var(--vspace-l);
+    }
+  }
 }
 
 .popup-placeholder {
@@ -112,65 +99,27 @@
   display: none;
 }
 
-.pop-over .content-container {
-  display: flex;
-  align-items: stretch;
-  flex: 1;
-}
-
-/* Allow dynamic max-height to override default constraint for content-container */
-.pop-over[style*="max-height"] .content-container {
-  max-height: inherit;
-}
 
 .pop-over .popup-drag-handle {
-  cursor: move;
+  cursor: grab;
+
+  &:active {
+    cursor: grabbing;
+  }
 }
 
 body.mobile-mode  {
   .popup-drag-handle, .close-btn {
-    font-size: 1.4em;
+    font-size: var(--step-0);
     align-self: center;
-  }
-  .pop-over:has(.pop-over-list) {
-    min-width: 70vw;
   }
 }
 
 .pop-over .header-controls {
   display: flex;
-  gap: 1ch;
-}
-.pop-over .pop-over-list {
-  display: flex;
-  flex-direction: column;
-  flex: 1;
-  font-size: 1.1rem;
-  padding: 1ch;
-  >li>a {
-    flex: 1;
-    justify-self: stretch;
-    display: grid;
-    grid-auto-flow: column;
-    grid-auto-columns: auto;
-    justify-content: start;
-    padding: 0 0.5ch;
-    column-gap: 1ch;
-    .sub-name {
-      text-align: end;
-    }
-  }
 }
 /* Utility: remove left gutter inside specific popups */
 .pop-over .content .flush-left {
-  margin-left: 0;
-  padding-left: 0;
-  width: 100%;
-}
-
-/* Swimlane popups: remove left gutter, align content fully left */
-.pop-over .content form.swimlane-color-popup,
-.pop-over .content .swimlane-height-popup {
   margin-left: 0;
   padding-left: 0;
   width: 100%;
@@ -183,7 +132,11 @@ body.mobile-mode  {
   margin-left: 0;
   padding-left: 0;
   display: grid;
-  grid-template-columns: repeat(5, 1fr);
+  grid-auto-flow: dense;
+  grid-template-columns: repeat(auto-fill, 4.5ch);
+  grid-auto-rows: 4.5ch;
+  justify-content: stretch;
+  justify-items: stretch;
 }
 
 /* Color palette items: ensure proper positioning */
@@ -208,18 +161,11 @@ body.mobile-mode  {
   padding: 8px 12px;
   margin: 0 0 10px 0;
 }
-.pop-over .at-form .at-error {
-  background: #ef9a9a;
-}
 .pop-over .at-form .at-result {
   background: #b2dfdb;
 }
 .pop-over .sk-spinner {
   margin: 40px auto;
-}
-.select-members-list,
-.select-avatars-list {
-  margin-bottom: 8px;
 }
 .pop-over-list li {
   display: block;
@@ -230,9 +176,7 @@ body.mobile-mode  {
   cursor: pointer;
   display: block;
   font-weight: 700;
-  padding-inline: 2vmin 10vmin;
   position: relative;
-  margin: 0;
   text-decoration: none;
   overflow: hidden;
   display:flex;
@@ -247,8 +191,7 @@ body.mobile-mode  {
   display: block;
   width: auto;
 }
-.pop-over-list li > a:not(.disabled):hover {
-  background-color: #005377;
+.pop-over .header .close-btn i.fa {
   color: #fff;
 }
 .pop-over-list li > a:not(.disabled):hover .sub-name,
@@ -261,17 +204,17 @@ body.mobile-mode  {
 .pop-over-list li > a .sub-name {
   color: #8c8c8c;
   display: block;
-  font-size: 0.8em;
+  font-size: var(--step--1);
   font-weight: 400;
   line-height: 1.2em;
 }
-.pop-over-list li > a.current {
+.pop-over-list li:has(a.current) {
   background-color: #e2e6e9;
 }
-.pop-over-list li > a:active {
+.pop-over-list li:has(a:active) {
   background-color: #2e85b8;
 }
-.pop-over-list li > a.disabled {
+.pop-over-list li:has(a.disabled) {
   color: #8c8c8c;
   cursor: default;
 }
@@ -281,11 +224,11 @@ body.mobile-mode  {
 .pop-over-list li > a.disabled:hover {
   background: none;
 }
-.pop-over-list li > a.disabled:hover .sub-name,
-.pop-over-list li > a.disabled:hover .quiet {
+.pop-over-list li:has(a.disabled:hover .sub-name),
+.pop-over-list li:has(a.disabled:hover .quiet) {
   color: #8c8c8c;
 }
-.pop-over-list li > a.disabled:active {
+.pop-over-list li:has(a.disabled:active) {
   background: none;
 }
 .pop-over-list.inset li > a {
@@ -310,13 +253,6 @@ body.grey-icons-enabled .pop-over-list .pop-over-list.checkable .fa-check {
   color: #7a7a7a;
 }
 
-.pop-over .content > form {
-  padding: 0.3lh 1ch;
-  gap: 0.2lh;
-  display: flex;
-  max-width: clamp(20vw, 400px, 50vw);
-}
-
 body.mobile-mode .pop-over .content>form {
   max-width: 100%;
 }
@@ -325,5 +261,26 @@ body.mobile-mode .pop-over .content>form {
   >h3 {
     display: flex;
     flex-direction: column;
+  }
+}
+
+.pop-over .board-card-settings {
+  --t-columns: 12ch 12ch 20ch;
+  font-size: var(--step--1);
+}
+
+.pop-over {
+  &[data-popup="changeAvatarPopup"] {
+    --t-columns: 10ch 30ch min-content;
+  }
+  &[data-popup="changeSettingsPopup"] {
+    --t-columns: 30ch 15ch;
+    li {
+      place-items: center;
+      max-width: 15ch;
+    }
+  }
+  &[data-popup="deleteAvatarPopup"] {
+    width: 30ch;
   }
 }
