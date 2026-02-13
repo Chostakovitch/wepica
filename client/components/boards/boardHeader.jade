@@ -5,13 +5,13 @@ template(name="boardHeaderBar")
         if $eq title 'Templates'
           | {{_ 'templates'}}
         else
-          +viewer
-            = title
-          if currentBoard
-            if currentUser
-              with currentBoard
-                if currentUser.isBoardAdmin
-                  a.board-header-btn(class="{{#if currentUser.isBoardAdmin}}js-edit-board-title{{else}}is-disabled{{/if}}" title="{{_ 'edit'}}" value=title)
+          a.board-header-btn(class="{{#if currentUser.isBoardAdmin}}js-edit-board-title{{else}}is-disabled{{/if}}" title="{{_ 'edit'}}" value=title)
+            +viewer
+              = title
+            if currentBoard
+              if currentUser
+                with currentBoard
+                  if currentUser.isBoardAdmin
                     i.fa.fa-pencil-square-o
       unless isMiniScreen
         .board-header-btns-left
