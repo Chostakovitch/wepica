@@ -127,7 +127,7 @@ Template.createLabelPopup.events({
       .trim();
     const color = Blaze.getData(templateInstance.find('.fa-check')).color;
     board.addLabel(name, color);
-    Popup.back();
+    Popup.back(1, true);
   },
 });
 
