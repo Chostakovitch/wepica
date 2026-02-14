@@ -402,13 +402,25 @@ class PopupDetachedComponent extends BlazeComponent {
 class PopupComponent extends BlazeComponent {
   static stack = [];
   // good enough as long as few occurences of such cases
-  static multipleBlacklist = ["cardDetails"];
+  static nonUniqueWhitelist = ["cardDetails"];
 
+
+  static refresh(popups = PopupComponent.stack) {
+    // re-render a popup : too complicated to render only inner part, way safer
+    // to re-render all the component and view, and destroying everything before;
+    // reactivity is maintained. a list a popup to re-render can be given.
+    for (const p of PopupComponent.stack.filter(e => popups.includes(e))) {
+      let args = p.data();
+      p.destroy();
+      PopupComponent.open(args);
+    }
+  }
   // to provide compatibility with Popup.open().
   static open(args) {
     const openerView = Blaze.getView(args.openerElement);
     if (!openerView) {
-      console.warn(`no parent found for popup ${args.name}, attaching to body: this should not happen`);
+      console.warn(`no parent found for popup ${args.name}, attaching to body: this should not happen.`);
+      return;
     }
 
 
@@ -425,12 +437,18 @@ class PopupComponent extends BlazeComponent {
     return popup;
   }
 
-  static destroy() {
-    PopupComponent.stack.at(-1)?.destroy();
+  static destroy(renderParent) {
+    PopupComponent.stack.at(-1)?.destroy(renderParent);
   }
 
   static findParentPopup(element) {
     return BlazeComponent.getComponentForElement($(element).closest('.pop-over')[0]);
+  }
+
+  static draw(event) {
+    const popup = PopupComponent.findParentPopup(event.target);
+    popup?.draw();
+    return popup;
   }
 
   static toFront(event) {
@@ -499,24 +517,21 @@ class PopupComponent extends BlazeComponent {
   }
 
   onCreated() {
-  // #FIXME prevent secondary popups to open
-    // Special "magic number" case: never render, for any reason, the same card
-    // const maybeID = this.parentComponent?.()?.data?.()?._id;
-    // if (maybeID && PopupComponent.stack.find(e => e.parentComponent().data?.()?._id === maybeID)) {
-    //   this.destroy();
-    //   return;
-    // }
-    // do not render a template multiple times
-    const existing = PopupComponent.stack.find((e) => (e.name == this.data().name));
-    if (existing && PopupComponent.multipleBlacklist.indexOf(this.data().name)) {
-      // ⚠️ is there a default better than another? I feel that closing existing
-      // popup is not bad in general because having the same button for open and close
-      // is common
-      if (PopupComponent.multipleBlacklist.includes(existing.name)) {
-        existing.destroy();
-      }
-      // but is could also be re-rendering, eg
-      // existing.render();
+    // do not render a template with the same name and the same related data ID multiple time (also works if no ID)
+    // this heuristic works in general cases; for future edge cases, add to the whitelist
+    const maybeID = this.parentComponent?.()?.data?.()?._id;
+    const existing = PopupComponent.stack.find((e) => (e.name === this.data().name && e.parentComponent()?.data?.()?._id === maybeID));
+    if (existing && !PopupComponent.nonUniqueWhitelist.includes(existing.name)) {
+      // 💡 here, we could change the behaviour. some possibilities are:
+      // 1. destroy existing popup and let the current one open
+      // 2. destroy new popup and
+      //    a. do nothing
+      //    b. force re-rendering of existing popup
+      //    c. bring other popup to front (b. includes c.)
+      // ...
+      // for now we will just bring to front
+      this.destroy();
+      existing.outerComponent.toFront();
       return;
     }
 
@@ -529,8 +544,8 @@ class PopupComponent extends BlazeComponent {
     // - closeVar is an optional string representing a Session variable: if set, the popup reactively closes when the variable changes and set the variable to null on close
     // - closeDOMs can be used alternatively; it is an array of "<event> <selector>" to listen that closes the popup.
     //   if header is shown, closing the popup is already managed. selector is relative to the inner template (same as its event map)
-    // - followDOM is an element whose dimension will serve as reference so that popup can react to inner changes; works only with inline styles (otherwise we probably would need IntersectionObserver-like stuff, async etc)
     // - handleDOM is an element who can be clicked to move popup
+    // - onDestroy is a function which will be called previous destroying with the actual inner component as `this`.
     //   it is useful when the content can be redimensionned/moved by code or user; we still manage events, resizes etc
     //   but allow inner elements or handles to do it (and we adapt).
     const data = this.data();
@@ -540,18 +555,20 @@ class PopupComponent extends BlazeComponent {
       title: data.title,
       openerElement: data.openerElement,
       closeDOMs: data.closeDOMs,
-      followDOM: data.followDOM,
       handleDOM: data.handleDOM,
+      onDestroy: data.onDestroy,
       forceData: data.miscOptions?.dataContextIfCurrentDataIsUndefined || data.forceData,
       afterConfirm: data.miscOptions?.afterConfirm,
+      whatsThis: data.miscOptions?.whatsThis,
+      confirmArgs: data.confirmArgs,
+      controlComponent: this,
     }
     this.name = this.data().name;
 
     this.innerTemplate = Template[this.name];
-    this.innerComponent = BlazeComponent.getComponent(this.name);
-
-    this.outerComponent = BlazeComponent.getComponent('popupDetached');
-    if (!(this.innerComponent || this.innerTemplate)) {
+    this.innerComponentClass = BlazeComponent.getComponent(this.name);
+    this.outerComponentClass = BlazeComponent.getComponent('popupDetached');
+    if (!(this.innerComponentClass || this.innerTemplate)) {
       throw new Error(`template and/or component ${this.name} not found`);
     }
 
@@ -573,25 +590,32 @@ class PopupComponent extends BlazeComponent {
   }
 
   render() {
-    const oldOuterView = this.outerView;
     // see below for comments
     this.outerView = Blaze.renderWithData(
       // data is passed through the parent relationship
       // we need to render it again to keep events in sync with inner popup
-      this.outerComponent.renderComponent(this.component()),
+      this.outerComponentClass.renderComponent(this.component()),
       this.popupArgs,
       document.body,
       null,
       this.openerView
     );
+
+    const popupContentNode = this.outerView.firstNode?.()?.getElementsByClassName('content')?.[0];
+    // we really want to avoid zombies popups
+    if (!popupContentNode) {
+      console.warn('detached popup could not render; content div not found');
+      this.destroy();
+    }
+
     this.innerView = Blaze.renderWithData(
       // the template to render: either the content is a BlazeComponent or a regular template
       // if a BlazeComponent, render it as a template first
-      this.innerComponent?.renderComponent?.(this.component()) || this.innerTemplate,
+      this.innerComponentClass?.renderComponent?.(this.component()) || this.innerTemplate,
       // dataContext used for rendering: each time we go find data, because it is non-reactive
       () => (this.popupArgs.forceData || this.getParentData(this.currentView)),
       // DOM parent: ask to the detached popup, will be inserted at the last child
-      this.outerView.firstNode()?.getElementsByClassName('content')?.[0] || document.body,
+      popupContentNode,
       // "stop" DOM element; we don't use
       null,
       // important: this is the Blaze.View object which will be set as `parentView` of
@@ -600,9 +624,23 @@ class PopupComponent extends BlazeComponent {
       // manipulating DOM directly.
       this.openerView
     );
-    if (oldOuterView) {
-      Blaze.remove(oldOuterView);
+
+    // Get concrete instances instead of classes
+    this.outerComponent = BlazeComponent.getComponentForElement(this.outerView.firstNode?.());
+    this.outerComponent.draw();
+
+    // firstNode sometimes returns a text node; children return only Element.
+    const candidateInnerComponent = BlazeComponent.getComponentForElement(popupContentNode.children[0]);
+    // BlazeComponent will return the first component having rendered an ancestor;
+    // so sometimes the inner view is a simple template and not a component; if we do
+    // not take care, destroying this view will destroy e.g. parent inner...
+    if (candidateInnerComponent !== BlazeComponent.getComponentForElement(this.openerView.firstNode())) {
+      this.innerComponent = candidateInnerComponent;
     }
+  }
+
+  refresh() {
+    PopupComponent.refresh([this]);
   }
 
   onRendered() {
@@ -644,20 +682,27 @@ class PopupComponent extends BlazeComponent {
     }
   }
 
-  destroy() {
-    this.detached = true;
-    if (!PopupComponent.stack.includes(this)) {
+  destroy(renderParent) {
+    if (this.detached) {
       // Avoid loop destroy
       return;
     }
-    // Maybe overkill but may help to avoid leaking memory
-    // as programmatic rendering is less usual
-    for (const view of [this.innerView, this.currentView, this.outerView]) {
+    this.detached = true;
+    this.popupArgs?.onDestroy?.call?.(this.innerComponent);
+    this.observeChild?.disconnect();
+
+    // not necesserly removed in order, e.g. multiple cards
+    PopupComponent.stack = PopupComponent.stack.filter(e => e !== this);
+    if (renderParent) {
+      PopupComponent.refresh();
+    }
+
+    // unecessary upon "normal" conditions, but prefer destroy everything
+    // in case of partial initialization
+    for (const v of [this.currentView, this.outerView, this.innerView]) {
       try {
-        Blaze.remove(view);
-      } catch {
-        console.warn(`A view failed to be removed: ${view}`)
-      }
+        Blaze.remove(v);
+      } catch {}
     }
     this.innerComponent?.removeComponent?.();
     this.outerComponent?.removeComponent?.();
@@ -682,7 +727,7 @@ class PopupComponent extends BlazeComponent {
     }
     const observer = new MutationObserver(() => {
       // DOM element being suppressed is reflected in array
-      if (placeholder.length === 0) {
+      if (placeholder.length === 0 && !this.detached) {
         this.destroy();
       }
     });

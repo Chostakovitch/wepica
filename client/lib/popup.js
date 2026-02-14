@@ -2,6 +2,9 @@ import PopupComponent from '/client/components/main/popup';
 import { TAPi18n } from '/imports/i18n';
 
 window.Popup = new (class {
+  stack() {
+    return PopupComponent.stack;
+  }
   /// This function returns a callback that can be used in an event map:
   ///   Template.tplName.events({
   ///     'click .elementClass': Popup.open("popupName"),
