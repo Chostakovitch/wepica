@@ -24,7 +24,7 @@ const PopupBias = {
 class PopupDetachedComponent extends BlazeComponent {
   onCreated() {
     // Set by parent/caller (usually PopupComponent)
-    ({ nonPlaceholderOpener: this.nonPlaceholderOpener, closeDOMs: this.closeDOMs = [], followDOM: this.followDOM } = this.data());
+    ({ nonPlaceholderOpener: this.nonPlaceholderOpener, closeDOMs: this.closeDOMs = [] } = this.data());
 
 
     if (typeof(this.closeDOMs) === "string") {
@@ -34,6 +34,10 @@ class PopupDetachedComponent extends BlazeComponent {
 
     // The popup's own header, if it exists
     this.closeDOMs.push("click .js-close-detached-popup");
+    // Also try to be smart...
+    this.closeDOMs.push("click .js-close");
+
+    this.handleDOM = this.data().handleDOM;
   }
 
   // Main intent of this component is to have a modular popup with defaults:
@@ -44,42 +48,41 @@ class PopupDetachedComponent extends BlazeComponent {
   // * issue is that it is done by hand, with heurisitic/simple algorithm from my thoughts, not sure it covers edge cases
   // * however it works well so far and maybe more "fixed" element should be popups
   onRendered() {
-    // Remember initial ratio between initial dimensions and viewport
-    const viewportHeight = window.innerHeight;
-    const viewportWidth = window.innerWidth;
-
     this.popup = this.firstNode();
     this.popupOpener = this.data().openerElement;
+    this.controlComponent = this.data().controlComponent;
+    // So we can bind "this" when handling events, especially for afterConfirm-ish
+    this.openerComponent = BlazeComponent.getComponentForElement(this.popupOpener);
 
     const popupStyle = window.getComputedStyle(this.firstNode());
     // margin may be in a relative unit, not computable in JS, but we get the actual pixels here
     this.popupMargin = parseFloat(popupStyle.getPropertyValue("--popup-margin"), 10) || Math.min(window.innerWidth / 50, window.innerHeight / 50);
 
-    this.dims(this.computeMaxDims());
+    this.draw();
+    // popups resize often, better follow them by default;
+    this.innerElement = this.find('.content');
+    this.observeChild = this.follow();
 
-    this.initialPopupWidth = this.popupDims.width;
-    this.initialPopupHeight = this.popupDims.height;
-    this.initialHeightRatio = this.initialPopupHeight / viewportHeight;
-    this.initialWidthRatio = this.initialPopupWidth / viewportWidth;
-
-    this.dims(this.computePopupDims());
-
-
-    if (this.followDOM) {
-      this.innerElement = this.find(this.followDOM) ?? document.querySelector(this.followDOM);
-    }
-
-    this.follow();
-    this.toFront();
-
-    // #FIXME the idea of keeping the initial ratio on resize is quite bad. remove that part.
-    // there is a reactive variable for window resize in Utils, but the interface is too slow
-    // with all reactive stuff, use events when possible and when not really bypassing logic
     $(window).on('resize', () => {
-      // #FIXME there is a bug when window grows; popup outer container
-      // will grow beyond the size of content and it's not easy to fix for me (and I feel tired of this popup)
-      this.dims(this.computePopupDims());
+      this.draw();
     });
+  }
+
+  draw() {
+    if (!this.isRendered()) {return;}
+    // Enables us to shrink when window goes little then big
+    // Othewise no easy way to know; easier to get shrinked
+    if (!this.initialWidthRatio || !this.initialHeightRatio) {
+      const maxDims = this.computeMaxDims();
+      this.initialWidthRatio = maxDims.width / window.innerWidth;
+      this.initialHeightRatio = maxDims.height / window.innerHeight;
+      this.initialWidth = maxDims.width;
+      this.initialHeight = maxDims.height;
+      this.initialWindowWidth = window.innerWidth;
+      this.initialWindowHeight = window.innerHeight;
+    }
+    this.dims(this.computePopupDims());
+    this.toFront();
   }
 
   margin() {
@@ -103,10 +106,13 @@ class PopupDetachedComponent extends BlazeComponent {
   }
 
   dims(newDims) {
+    if (!this.isRendered() || this.isDestroyed()) {return}
     if (!this.popupDims) {
       this.popupDims = {};
     }
     if (newDims) {
+      newDims.top ??= this.popupDims.top;
+      newDims.left ??= this.popupDims.left;
       newDims = this.ensureDimsLimit(newDims);
       for (const e of Object.keys(newDims)) {
         let value = parseFloat(newDims[e]);
@@ -137,15 +143,19 @@ class PopupDetachedComponent extends BlazeComponent {
     this.dims(this.computePopupDims());
   }
 
-  follow() {
-    const adaptChild = new ResizeObserver((_) => {
-      if (this.fullscreen) {return}
-      const width = this.innerElement?.scrollWidth || this.popup.scrollWidth;
-      const height = this.innerElement?.scrollHeight || this.popup.scrollHeight;
+  follow() {return new ResizeObserver((_) => {
+    if (!this.isRendered() || this.isDestroyed()) {
+      this.observeChild?.disconnect();
+      return;
+    }
+    if (this.fullscreen) {return}
+      const width = this.innerElement.scrollWidth;
+      const height = this.innerElement.scrollHeight + (this.find('.header')?.offsetHeight || 0);
+      // avoid possible small resizes loops, eg because of constraigned sizing or rounding
+      if (Math.abs(this.dims().width - width) < this.dims().width / 10 && Math.abs(this.dims().height - height) < this.dims().height / 10) { return }
+      if (this.dims().left + width > window.innerWidth || this.dims().top + height > window.innerHeight) {return;}
       // we don't want to run this during something that we have caused, eg. dragging
       if (!this.mouseDown) {
-        // extra-"future-proof" stuff: if somebody adds a margin to the popup, it would trigger a loop
-        if (Math.abs(this.dims().width - width) < 20 && Math.abs(this.dims().height - height) < 20) { return }
 
         // if inner shrinks, follow
         if (width < this.dims().width || height < this.dims().height) {
@@ -167,22 +177,15 @@ class PopupDetachedComponent extends BlazeComponent {
       }
       else {
         const { width, height } = this.popup.getBoundingClientRect();
-        // only case when we bypass .dims(), to avoid loop
         this.popupDims.width = width;
         this.popupDims.height = height;
       }
-    });
-
-    if (this.innerElement) {
-      adaptChild.observe(this.innerElement);
-    } else {
-      adaptChild.observe(this.popup);
-    }
+    }).observe(this.innerElement);
   }
 
   currentZ(z = undefined) {
     // relative, add a constant to be above root elements
-    if (z !== undefined) {
+    if (z !== undefined && this.firstNode()) {
       this.firstNode().style.zIndex = parseInt(z) + 10;
     }
     return parseInt(this.firstNode().style.zIndex) - 10;
@@ -190,27 +193,43 @@ class PopupDetachedComponent extends BlazeComponent {
 
   // a bit complex...
   toFront() {
-    this.currentZ(Math.max(...PopupComponent.stack.map(p => BlazeComponent.getComponentForElement(p.outerView.firstNode()).currentZ())) || 0 + 1);
+    if (!this.isRendered() || !this.firstNode()) {return}
+    // NaN should not happen, but .max will return NaN is it is present; better filter
+    this.currentZ((Math.max(...PopupComponent.stack.map(p => BlazeComponent.getComponentForElement(p.outerView.firstNode?.()).currentZ?.()).filter(e => !isNaN(e))) || 0) + 1);
 
   }
 
   toBack() {
-    this.currentZ(Math.min(...PopupComponent.stack.map(p => BlazeComponent.getComponentForElement(p.outerView.firstNode()).currentZ())) || 1 - 1);
+    if (!this.isRendered() || !this.firstNode()) {return}
+    this.currentZ((Math.min(...PopupComponent.stack.map(p => BlazeComponent.getComponentForElement(p.outerView.firstNode?.()).currentZ?.()).filter(e => !isNaN(e))) || 1) - 1);
   }
 
   events() {
-    // needs to be done at this level; "parent" is not a parent in DOM
     let closeEvents = {};
-
     this.closeDOMs?.forEach((e) => {
-      closeEvents[e] = (_) => {
-        this.parentComponent().destroy();
+      closeEvents[e] = (event) => {
+        // make sure that we are really the target, just in case; popup can be
+        // really frustrating when not behaving as expected
+        if (PopupComponent.findParentPopup(event.target) === this) {
+          this.controlComponent.destroy();
+        }
       }
     })
 
     const miscEvents = {
-      'click .js-confirm'() {
-        this.data().afterConfirm?.call(this);
+      'click .js-confirm'(e) {
+        const afterConfirm = this.data().afterConfirm;
+        if (afterConfirm) {
+          // as the popup stack is a bit more flexible, you can get events
+          // from popups at the bottom; it is possible to find back their
+          // popup component eg. to destroy them, but just add it to
+          // the event; probably a bit dirty but also more deterministic.s
+          // Here, the caller can choose what will be "this" in the callback;
+          // default to the component which triggered opening of popup, to ease retrocompatibility
+          const args = Object.assign(this.data().confirmArgs ?? {}, {popup: this.controlComponent});
+          // the original behaviour is to have data of opener as this
+          afterConfirm.call(this.data().whatsThis ?? Blaze.getData(this.openerView), e, args);
+        }
       },
       // bad heuristic but only for best-effort UI
       'pointerdown .pop-over'() {
@@ -228,7 +247,10 @@ class PopupDetachedComponent extends BlazeComponent {
       const deltaHandleY = this.dims().top - event.clientY;
 
       const onPointerMove = (e) => {
-        this.dims(this.ensureDimsLimit({ left: e.clientX + deltaHandleX, top: e.clientY + deltaHandleY, width: this.dims().width, height: this.dims().height }));
+        // previously I used to resize popup when reaching border but it's a so bad idea, triggers loop
+        // with other resizing/moving mechanisms, and is probably bad in terms of UI.
+        // only interest was maybe on mobile where there is no CSS resize
+        this.dims(this.ensureDimsLimit({ left: e.clientX + deltaHandleX, top: e.clientY + deltaHandleY }));
 
         if (this.popup.scrollY) {
           this.popup.scrollTo(0, 0);
@@ -251,22 +273,22 @@ class PopupDetachedComponent extends BlazeComponent {
     };
 
     // We do not manage dragging without our own header
-    const handleDOM = this.data().handleDOM;
     if (this.data().showHeader) {
       const handleSelector = Utils.isMiniScreen() ? '.js-popup-drag-handle' : '.header-title';
       miscEvents[`pointerdown ${handleSelector}`] = (e) => movePopup(e);
     }
-    if (handleDOM) {
-      miscEvents[`pointerdown ${handleDOM}`] = (e) => movePopup(e);
+    if (this.handleDOM) {
+      miscEvents[`pointerdown ${this.handleDOM}`] = (e) => movePopup(e);
     }
     return super.events().concat(closeEvents).concat(miscEvents);
   }
 
   computeMaxDims() {
+    if (!this.isRendered()) {return;}
     // Get size of inner content, even if it overflows
     const content = this.find('.content');
-    let popupHeight = content.scrollHeight;
-    let popupWidth = content.scrollWidth;
+    let popupHeight = content?.scrollHeight;
+    let popupWidth = content?.scrollWidth;
     if (this.data().showHeader) {
       const headerRect = this.find('.header');
       popupHeight += headerRect.scrollHeight;
@@ -355,9 +377,18 @@ class PopupDetachedComponent extends BlazeComponent {
     let { x: parentX, y: parentY } = this.nonPlaceholderOpener.getBoundingClientRect();
     let { height: parentHeight, width: parentWidth } = this.nonPlaceholderOpener.getBoundingClientRect();
 
-    // Initial dimensions scaled to the viewport, if it has changed
-    let popupHeight = window.innerHeight * this.initialHeightRatio;
-    let popupWidth = window.innerWidth * this.initialWidthRatio;
+
+    // Don't scale the popup down, too bad things can happen, e.g. rescaling it up; scaling content is enough
+    let popupHeight = this.initialHeight;
+    let popupWidth = this.initialWidth;
+    // If redrawing after upscaling the viewport, don't let popup go beyond their initial size
+    if (popupWidth > this.initialWidth && this.initialWidthRatio * this.initialWidth >= this.initialWindowWidth) {
+      popupWidth = this.initialWidth;
+    }
+    if (popupHeight > this.initialHeight && this.initialHeightRatio * this.initialHeight >= this.initialWindowHeight) {
+      popupHeight = this.initialHeight;
+    }
+
 
     if (this.fullscreen || Utils.isMiniScreen() && popupWidth >= 4 * window.innerWidth / 5 && popupHeight >= 4 * window.innerHeight / 5) {
       // Go fullscreen!
@@ -397,18 +428,35 @@ class PopupDetachedComponent extends BlazeComponent {
       });
     }
   }
+
+  colorClass() {
+    // if we are outside a board view, find a color used in a board to keep a bit of color everywhere
+    return Utils.getCurrentBoard()?.colorClass() ?? ReactiveCache.getBoards().find(e => e.colorClass())?.colorClass();
+  }
 }
 
 class PopupComponent extends BlazeComponent {
   static stack = [];
   // good enough as long as few occurences of such cases
-  static multipleBlacklist = ["cardDetails"];
+  static nonUniqueWhitelist = ["cardDetails"];
 
+
+  static refresh(popups = PopupComponent.stack) {
+    // re-render a popup : too complicated to render only inner part, way safer
+    // to re-render all the component and view, and destroying everything before;
+    // reactivity is maintained. a list a popup to re-render can be given.
+    for (const p of PopupComponent.stack.filter(e => popups.includes(e))) {
+      let args = p.data();
+      p.destroy();
+      PopupComponent.open(args);
+    }
+  }
   // to provide compatibility with Popup.open().
   static open(args) {
     const openerView = Blaze.getView(args.openerElement);
     if (!openerView) {
-      console.warn(`no parent found for popup ${args.name}, attaching to body: this should not happen`);
+      console.warn(`no parent found for popup ${args.name}, attaching to body: this should not happen.`);
+      return;
     }
 
 
@@ -425,12 +473,18 @@ class PopupComponent extends BlazeComponent {
     return popup;
   }
 
-  static destroy() {
-    PopupComponent.stack.at(-1)?.destroy();
+  static destroy(renderParent) {
+    PopupComponent.stack.at(-1)?.destroy(renderParent);
   }
 
   static findParentPopup(element) {
     return BlazeComponent.getComponentForElement($(element).closest('.pop-over')[0]);
+  }
+
+  static draw(event) {
+    const popup = PopupComponent.findParentPopup(event.target);
+    popup?.draw();
+    return popup;
   }
 
   static toFront(event) {
@@ -499,24 +553,21 @@ class PopupComponent extends BlazeComponent {
   }
 
   onCreated() {
-  // #FIXME prevent secondary popups to open
-    // Special "magic number" case: never render, for any reason, the same card
-    // const maybeID = this.parentComponent?.()?.data?.()?._id;
-    // if (maybeID && PopupComponent.stack.find(e => e.parentComponent().data?.()?._id === maybeID)) {
-    //   this.destroy();
-    //   return;
-    // }
-    // do not render a template multiple times
-    const existing = PopupComponent.stack.find((e) => (e.name == this.data().name));
-    if (existing && PopupComponent.multipleBlacklist.indexOf(this.data().name)) {
-      // ⚠️ is there a default better than another? I feel that closing existing
-      // popup is not bad in general because having the same button for open and close
-      // is common
-      if (PopupComponent.multipleBlacklist.includes(existing.name)) {
-        existing.destroy();
-      }
-      // but is could also be re-rendering, eg
-      // existing.render();
+    // do not render a template with the same name and the same related data ID multiple time (also works if no ID)
+    // this heuristic works in general cases; for future edge cases, add to the whitelist
+    const maybeID = this.parentComponent?.()?.data?.()?._id;
+    const existing = PopupComponent.stack.find((e) => (e.name === this.data().name && e.parentComponent()?.data?.()?._id === maybeID));
+    if (existing && !PopupComponent.nonUniqueWhitelist.includes(existing.name)) {
+      // 💡 here, we could change the behaviour. some possibilities are:
+      // 1. destroy existing popup and let the current one open
+      // 2. destroy new popup and
+      //    a. do nothing
+      //    b. force re-rendering of existing popup
+      //    c. bring other popup to front (b. includes c.)
+      // ...
+      // for now we will just bring to front
+      this.destroy();
+      existing.outerComponent.toFront();
       return;
     }
 
@@ -529,8 +580,8 @@ class PopupComponent extends BlazeComponent {
     // - closeVar is an optional string representing a Session variable: if set, the popup reactively closes when the variable changes and set the variable to null on close
     // - closeDOMs can be used alternatively; it is an array of "<event> <selector>" to listen that closes the popup.
     //   if header is shown, closing the popup is already managed. selector is relative to the inner template (same as its event map)
-    // - followDOM is an element whose dimension will serve as reference so that popup can react to inner changes; works only with inline styles (otherwise we probably would need IntersectionObserver-like stuff, async etc)
     // - handleDOM is an element who can be clicked to move popup
+    // - onDestroy is a function which will be called previous destroying with the actual inner component as `this`.
     //   it is useful when the content can be redimensionned/moved by code or user; we still manage events, resizes etc
     //   but allow inner elements or handles to do it (and we adapt).
     const data = this.data();
@@ -540,18 +591,20 @@ class PopupComponent extends BlazeComponent {
       title: data.title,
       openerElement: data.openerElement,
       closeDOMs: data.closeDOMs,
-      followDOM: data.followDOM,
       handleDOM: data.handleDOM,
+      onDestroy: data.onDestroy,
       forceData: data.miscOptions?.dataContextIfCurrentDataIsUndefined || data.forceData,
       afterConfirm: data.miscOptions?.afterConfirm,
+      whatsThis: data.miscOptions?.whatsThis,
+      confirmArgs: data.confirmArgs,
+      controlComponent: this,
     }
     this.name = this.data().name;
 
     this.innerTemplate = Template[this.name];
-    this.innerComponent = BlazeComponent.getComponent(this.name);
-
-    this.outerComponent = BlazeComponent.getComponent('popupDetached');
-    if (!(this.innerComponent || this.innerTemplate)) {
+    this.innerComponentClass = BlazeComponent.getComponent(this.name);
+    this.outerComponentClass = BlazeComponent.getComponent('popupDetached');
+    if (!(this.innerComponentClass || this.innerTemplate)) {
       throw new Error(`template and/or component ${this.name} not found`);
     }
 
@@ -573,25 +626,32 @@ class PopupComponent extends BlazeComponent {
   }
 
   render() {
-    const oldOuterView = this.outerView;
     // see below for comments
     this.outerView = Blaze.renderWithData(
       // data is passed through the parent relationship
       // we need to render it again to keep events in sync with inner popup
-      this.outerComponent.renderComponent(this.component()),
+      this.outerComponentClass.renderComponent(this.component()),
       this.popupArgs,
       document.body,
       null,
       this.openerView
     );
+
+    const popupContentNode = this.outerView.firstNode?.()?.getElementsByClassName('content')?.[0];
+    // we really want to avoid zombies popups
+    if (!popupContentNode) {
+      console.warn('detached popup could not render; content div not found');
+      this.destroy();
+    }
+
     this.innerView = Blaze.renderWithData(
       // the template to render: either the content is a BlazeComponent or a regular template
       // if a BlazeComponent, render it as a template first
-      this.innerComponent?.renderComponent?.(this.component()) || this.innerTemplate,
+      this.innerComponentClass?.renderComponent?.(this.component()) || this.innerTemplate,
       // dataContext used for rendering: each time we go find data, because it is non-reactive
       () => (this.popupArgs.forceData || this.getParentData(this.currentView)),
       // DOM parent: ask to the detached popup, will be inserted at the last child
-      this.outerView.firstNode()?.getElementsByClassName('content')?.[0] || document.body,
+      popupContentNode,
       // "stop" DOM element; we don't use
       null,
       // important: this is the Blaze.View object which will be set as `parentView` of
@@ -600,9 +660,23 @@ class PopupComponent extends BlazeComponent {
       // manipulating DOM directly.
       this.openerView
     );
-    if (oldOuterView) {
-      Blaze.remove(oldOuterView);
+
+    // Get concrete instances instead of classes
+    this.outerComponent = BlazeComponent.getComponentForElement(this.outerView.firstNode?.());
+    this.outerComponent.draw();
+
+    // firstNode sometimes returns a text node; children return only Element.
+    const candidateInnerComponent = BlazeComponent.getComponentForElement(popupContentNode.children[0]);
+    // BlazeComponent will return the first component having rendered an ancestor;
+    // so sometimes the inner view is a simple template and not a component; if we do
+    // not take care, destroying this view will destroy e.g. parent inner...
+    if (candidateInnerComponent !== BlazeComponent.getComponentForElement(this.openerView.firstNode())) {
+      this.innerComponent = candidateInnerComponent;
     }
+  }
+
+  refresh() {
+    PopupComponent.refresh([this]);
   }
 
   onRendered() {
@@ -644,27 +718,31 @@ class PopupComponent extends BlazeComponent {
     }
   }
 
-  destroy() {
-    this.detached = true;
-    if (!PopupComponent.stack.includes(this)) {
+  destroy(renderParent) {
+    if (this.detached) {
       // Avoid loop destroy
       return;
     }
-    // Maybe overkill but may help to avoid leaking memory
-    // as programmatic rendering is less usual
-    for (const view of [this.innerView, this.currentView, this.outerView]) {
+    this.detached = true;
+    this.popupArgs?.onDestroy?.call?.(this.innerComponent);
+    this.observeChild?.disconnect();
+
+    // not necesserly removed in order, e.g. multiple cards
+    PopupComponent.stack = PopupComponent.stack.filter(e => e !== this);
+    if (renderParent) {
+      PopupComponent.refresh();
+    }
+
+    // unecessary upon "normal" conditions, but prefer destroy everything
+    // in case of partial initialization
+    for (const v of [this.currentView, this.outerView, this.innerView]) {
       try {
-        Blaze.remove(view);
-      } catch {
-        console.warn(`A view failed to be removed: ${view}`)
-      }
+        Blaze.remove(v);
+      } catch {}
     }
     this.innerComponent?.removeComponent?.();
     this.outerComponent?.removeComponent?.();
     this.removeComponent();
-
-    // not necesserly removed in order, e.g. multiple cards
-    PopupComponent.stack = PopupComponent.stack.filter(e => e !== this);
   }
 
 
@@ -682,7 +760,7 @@ class PopupComponent extends BlazeComponent {
     }
     const observer = new MutationObserver(() => {
       // DOM element being suppressed is reflected in array
-      if (placeholder.length === 0) {
+      if (placeholder.length === 0 && !this.detached) {
         this.destroy();
       }
     });

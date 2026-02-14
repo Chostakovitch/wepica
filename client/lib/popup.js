@@ -2,6 +2,9 @@ import PopupComponent from '/client/components/main/popup';
 import { TAPi18n } from '/imports/i18n';
 
 window.Popup = new (class {
+  stack() {
+    return PopupComponent.stack;
+  }
   /// This function returns a callback that can be used in an event map:
   ///   Template.tplName.events({
   ///     'click .elementClass': Popup.open("popupName"),
@@ -29,14 +32,15 @@ window.Popup = new (class {
   ///       // What to do after the user has confirmed the action
   ///     }),
   ///   });
-  afterConfirm(name, action) {
+  afterConfirm(name, action, whatsThis, popupArgs) {
     const self = this;
     return function(evt, tpl) {
       tpl ??= {};
       tpl.afterConfirm = action;
+      tpl.whatsThis = whatsThis;
       // Just a wrapper of open which will call `action` on some events
       // see PopupDetachedComponent; for now this is hardcoded
-      self.open(name)(evt, tpl);
+      self.open(name, popupArgs)(evt, tpl);
       evt.preventDefault();
     };
   }
@@ -46,8 +50,8 @@ window.Popup = new (class {
   /// by providing a number to this function, e.g. `Popup.back(2)`. In this case
   /// intermediate popup won't even be rendered on the DOM. If the number of
   /// steps back is greater than the popup stack size, the popup will be closed.
-  back(n = 1) {
-    _.times(n, () => PopupComponent.destroy());
+  back(n = 1, renderParent = false) {
+    _.times(n, () => PopupComponent.destroy(renderParent));
   }
 
   /// Close the current opened popup.
