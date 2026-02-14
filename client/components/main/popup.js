@@ -48,10 +48,6 @@ class PopupDetachedComponent extends BlazeComponent {
   // * issue is that it is done by hand, with heurisitic/simple algorithm from my thoughts, not sure it covers edge cases
   // * however it works well so far and maybe more "fixed" element should be popups
   onRendered() {
-    // Remember initial ratio between initial dimensions and viewport
-    const viewportHeight = window.innerHeight;
-    const viewportWidth = window.innerWidth;
-
     this.popup = this.firstNode();
     this.popupOpener = this.data().openerElement;
     this.controlComponent = this.data().controlComponent;
@@ -62,31 +58,31 @@ class PopupDetachedComponent extends BlazeComponent {
     // margin may be in a relative unit, not computable in JS, but we get the actual pixels here
     this.popupMargin = parseFloat(popupStyle.getPropertyValue("--popup-margin"), 10) || Math.min(window.innerWidth / 50, window.innerHeight / 50);
 
-    this.dims(this.computeMaxDims());
+    this.draw();
+    // popups resize often, better follow them by default;
+    this.innerElement = this.find('.content');
+    this.observeChild = this.follow();
 
-    this.initialPopupWidth = this.popupDims.width;
-    this.initialPopupHeight = this.popupDims.height;
-    this.initialHeightRatio = this.initialPopupHeight / viewportHeight;
-    this.initialWidthRatio = this.initialPopupWidth / viewportWidth;
-
-    this.dims(this.computePopupDims());
-
-
-    if (this.followDOM) {
-      this.innerElement = this.find(this.followDOM) ?? document.querySelector(this.followDOM);
-    }
-
-    this.follow();
-    this.toFront();
-
-    // #FIXME the idea of keeping the initial ratio on resize is quite bad. remove that part.
-    // there is a reactive variable for window resize in Utils, but the interface is too slow
-    // with all reactive stuff, use events when possible and when not really bypassing logic
     $(window).on('resize', () => {
-      // #FIXME there is a bug when window grows; popup outer container
-      // will grow beyond the size of content and it's not easy to fix for me (and I feel tired of this popup)
-      this.dims(this.computePopupDims());
+      this.draw();
     });
+  }
+
+  draw() {
+    if (!this.isRendered()) {return;}
+    // Enables us to shrink when window goes little then big
+    // Othewise no easy way to know; easier to get shrinked
+    if (!this.initialWidthRatio || !this.initialHeightRatio) {
+      const maxDims = this.computeMaxDims();
+      this.initialWidthRatio = maxDims.width / window.innerWidth;
+      this.initialHeightRatio = maxDims.height / window.innerHeight;
+      this.initialWidth = maxDims.width;
+      this.initialHeight = maxDims.height;
+      this.initialWindowWidth = window.innerWidth;
+      this.initialWindowHeight = window.innerHeight;
+    }
+    this.dims(this.computePopupDims());
+    this.toFront();
   }
 
   margin() {
@@ -110,10 +106,13 @@ class PopupDetachedComponent extends BlazeComponent {
   }
 
   dims(newDims) {
+    if (!this.isRendered() || this.isDestroyed()) {return}
     if (!this.popupDims) {
       this.popupDims = {};
     }
     if (newDims) {
+      newDims.top ??= this.popupDims.top;
+      newDims.left ??= this.popupDims.left;
       newDims = this.ensureDimsLimit(newDims);
       for (const e of Object.keys(newDims)) {
         let value = parseFloat(newDims[e]);
@@ -144,15 +143,19 @@ class PopupDetachedComponent extends BlazeComponent {
     this.dims(this.computePopupDims());
   }
 
-  follow() {
-    const adaptChild = new ResizeObserver((_) => {
-      if (this.fullscreen) {return}
-      const width = this.innerElement?.scrollWidth || this.popup.scrollWidth;
-      const height = this.innerElement?.scrollHeight || this.popup.scrollHeight;
+  follow() {return new ResizeObserver((_) => {
+    if (!this.isRendered() || this.isDestroyed()) {
+      this.observeChild?.disconnect();
+      return;
+    }
+    if (this.fullscreen) {return}
+      const width = this.innerElement.scrollWidth;
+      const height = this.innerElement.scrollHeight + (this.find('.header')?.offsetHeight || 0);
+      // avoid possible small resizes loops, eg because of constraigned sizing or rounding
+      if (Math.abs(this.dims().width - width) < this.dims().width / 10 && Math.abs(this.dims().height - height) < this.dims().height / 10) { return }
+      if (this.dims().left + width > window.innerWidth || this.dims().top + height > window.innerHeight) {return;}
       // we don't want to run this during something that we have caused, eg. dragging
       if (!this.mouseDown) {
-        // extra-"future-proof" stuff: if somebody adds a margin to the popup, it would trigger a loop
-        if (Math.abs(this.dims().width - width) < 20 && Math.abs(this.dims().height - height) < 20) { return }
 
         // if inner shrinks, follow
         if (width < this.dims().width || height < this.dims().height) {
@@ -174,22 +177,15 @@ class PopupDetachedComponent extends BlazeComponent {
       }
       else {
         const { width, height } = this.popup.getBoundingClientRect();
-        // only case when we bypass .dims(), to avoid loop
         this.popupDims.width = width;
         this.popupDims.height = height;
       }
-    });
-
-    if (this.innerElement) {
-      adaptChild.observe(this.innerElement);
-    } else {
-      adaptChild.observe(this.popup);
-    }
+    }).observe(this.innerElement);
   }
 
   currentZ(z = undefined) {
     // relative, add a constant to be above root elements
-    if (z !== undefined) {
+    if (z !== undefined && this.firstNode()) {
       this.firstNode().style.zIndex = parseInt(z) + 10;
     }
     return parseInt(this.firstNode().style.zIndex) - 10;
@@ -209,9 +205,7 @@ class PopupDetachedComponent extends BlazeComponent {
   }
 
   events() {
-    // needs to be done at this level; "parent" is not a parent in DOM
     let closeEvents = {};
-
     this.closeDOMs?.forEach((e) => {
       closeEvents[e] = (event) => {
         // make sure that we are really the target, just in case; popup can be
@@ -253,7 +247,10 @@ class PopupDetachedComponent extends BlazeComponent {
       const deltaHandleY = this.dims().top - event.clientY;
 
       const onPointerMove = (e) => {
-        this.dims(this.ensureDimsLimit({ left: e.clientX + deltaHandleX, top: e.clientY + deltaHandleY, width: this.dims().width, height: this.dims().height }));
+        // previously I used to resize popup when reaching border but it's a so bad idea, triggers loop
+        // with other resizing/moving mechanisms, and is probably bad in terms of UI.
+        // only interest was maybe on mobile where there is no CSS resize
+        this.dims(this.ensureDimsLimit({ left: e.clientX + deltaHandleX, top: e.clientY + deltaHandleY }));
 
         if (this.popup.scrollY) {
           this.popup.scrollTo(0, 0);
@@ -276,22 +273,22 @@ class PopupDetachedComponent extends BlazeComponent {
     };
 
     // We do not manage dragging without our own header
-    const handleDOM = this.data().handleDOM;
     if (this.data().showHeader) {
       const handleSelector = Utils.isMiniScreen() ? '.js-popup-drag-handle' : '.header-title';
       miscEvents[`pointerdown ${handleSelector}`] = (e) => movePopup(e);
     }
-    if (handleDOM) {
-      miscEvents[`pointerdown ${handleDOM}`] = (e) => movePopup(e);
+    if (this.handleDOM) {
+      miscEvents[`pointerdown ${this.handleDOM}`] = (e) => movePopup(e);
     }
     return super.events().concat(closeEvents).concat(miscEvents);
   }
 
   computeMaxDims() {
+    if (!this.isRendered()) {return;}
     // Get size of inner content, even if it overflows
     const content = this.find('.content');
-    let popupHeight = content.scrollHeight;
-    let popupWidth = content.scrollWidth;
+    let popupHeight = content?.scrollHeight;
+    let popupWidth = content?.scrollWidth;
     if (this.data().showHeader) {
       const headerRect = this.find('.header');
       popupHeight += headerRect.scrollHeight;
@@ -380,9 +377,18 @@ class PopupDetachedComponent extends BlazeComponent {
     let { x: parentX, y: parentY } = this.nonPlaceholderOpener.getBoundingClientRect();
     let { height: parentHeight, width: parentWidth } = this.nonPlaceholderOpener.getBoundingClientRect();
 
-    // Initial dimensions scaled to the viewport, if it has changed
-    let popupHeight = window.innerHeight * this.initialHeightRatio;
-    let popupWidth = window.innerWidth * this.initialWidthRatio;
+
+    // Don't scale the popup down, too bad things can happen, e.g. rescaling it up; scaling content is enough
+    let popupHeight = this.initialHeight;
+    let popupWidth = this.initialWidth;
+    // If redrawing after upscaling the viewport, don't let popup go beyond their initial size
+    if (popupWidth > this.initialWidth && this.initialWidthRatio * this.initialWidth >= this.initialWindowWidth) {
+      popupWidth = this.initialWidth;
+    }
+    if (popupHeight > this.initialHeight && this.initialHeightRatio * this.initialHeight >= this.initialWindowHeight) {
+      popupHeight = this.initialHeight;
+    }
+
 
     if (this.fullscreen || Utils.isMiniScreen() && popupWidth >= 4 * window.innerWidth / 5 && popupHeight >= 4 * window.innerHeight / 5) {
       // Go fullscreen!
@@ -421,6 +427,11 @@ class PopupDetachedComponent extends BlazeComponent {
         top: candidateY,
       });
     }
+  }
+
+  colorClass() {
+    // if we are outside a board view, find a color used in a board to keep a bit of color everywhere
+    return Utils.getCurrentBoard()?.colorClass() ?? ReactiveCache.getBoards().find(e => e.colorClass())?.colorClass();
   }
 }
 
