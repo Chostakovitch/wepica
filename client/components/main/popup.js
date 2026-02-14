@@ -24,7 +24,7 @@ const PopupBias = {
 class PopupDetachedComponent extends BlazeComponent {
   onCreated() {
     // Set by parent/caller (usually PopupComponent)
-    ({ nonPlaceholderOpener: this.nonPlaceholderOpener, closeDOMs: this.closeDOMs = [], followDOM: this.followDOM } = this.data());
+    ({ nonPlaceholderOpener: this.nonPlaceholderOpener, closeDOMs: this.closeDOMs = [] } = this.data());
 
 
     if (typeof(this.closeDOMs) === "string") {
@@ -34,6 +34,10 @@ class PopupDetachedComponent extends BlazeComponent {
 
     // The popup's own header, if it exists
     this.closeDOMs.push("click .js-close-detached-popup");
+    // Also try to be smart...
+    this.closeDOMs.push("click .js-close");
+
+    this.handleDOM = this.data().handleDOM;
   }
 
   // Main intent of this component is to have a modular popup with defaults:
@@ -50,6 +54,9 @@ class PopupDetachedComponent extends BlazeComponent {
 
     this.popup = this.firstNode();
     this.popupOpener = this.data().openerElement;
+    this.controlComponent = this.data().controlComponent;
+    // So we can bind "this" when handling events, especially for afterConfirm-ish
+    this.openerComponent = BlazeComponent.getComponentForElement(this.popupOpener);
 
     const popupStyle = window.getComputedStyle(this.firstNode());
     // margin may be in a relative unit, not computable in JS, but we get the actual pixels here
@@ -190,12 +197,15 @@ class PopupDetachedComponent extends BlazeComponent {
 
   // a bit complex...
   toFront() {
-    this.currentZ(Math.max(...PopupComponent.stack.map(p => BlazeComponent.getComponentForElement(p.outerView.firstNode()).currentZ())) || 0 + 1);
+    if (!this.isRendered() || !this.firstNode()) {return}
+    // NaN should not happen, but .max will return NaN is it is present; better filter
+    this.currentZ((Math.max(...PopupComponent.stack.map(p => BlazeComponent.getComponentForElement(p.outerView.firstNode?.()).currentZ?.()).filter(e => !isNaN(e))) || 0) + 1);
 
   }
 
   toBack() {
-    this.currentZ(Math.min(...PopupComponent.stack.map(p => BlazeComponent.getComponentForElement(p.outerView.firstNode()).currentZ())) || 1 - 1);
+    if (!this.isRendered() || !this.firstNode()) {return}
+    this.currentZ((Math.min(...PopupComponent.stack.map(p => BlazeComponent.getComponentForElement(p.outerView.firstNode?.()).currentZ?.()).filter(e => !isNaN(e))) || 1) - 1);
   }
 
   events() {
@@ -203,14 +213,29 @@ class PopupDetachedComponent extends BlazeComponent {
     let closeEvents = {};
 
     this.closeDOMs?.forEach((e) => {
-      closeEvents[e] = (_) => {
-        this.parentComponent().destroy();
+      closeEvents[e] = (event) => {
+        // make sure that we are really the target, just in case; popup can be
+        // really frustrating when not behaving as expected
+        if (PopupComponent.findParentPopup(event.target) === this) {
+          this.controlComponent.destroy();
+        }
       }
     })
 
     const miscEvents = {
-      'click .js-confirm'() {
-        this.data().afterConfirm?.call(this);
+      'click .js-confirm'(e) {
+        const afterConfirm = this.data().afterConfirm;
+        if (afterConfirm) {
+          // as the popup stack is a bit more flexible, you can get events
+          // from popups at the bottom; it is possible to find back their
+          // popup component eg. to destroy them, but just add it to
+          // the event; probably a bit dirty but also more deterministic.s
+          // Here, the caller can choose what will be "this" in the callback;
+          // default to the component which triggered opening of popup, to ease retrocompatibility
+          const args = Object.assign(this.data().confirmArgs ?? {}, {popup: this.controlComponent});
+          // the original behaviour is to have data of opener as this
+          afterConfirm.call(this.data().whatsThis ?? Blaze.getData(this.openerView), e, args);
+        }
       },
       // bad heuristic but only for best-effort UI
       'pointerdown .pop-over'() {
@@ -707,9 +732,6 @@ class PopupComponent extends BlazeComponent {
     this.innerComponent?.removeComponent?.();
     this.outerComponent?.removeComponent?.();
     this.removeComponent();
-
-    // not necesserly removed in order, e.g. multiple cards
-    PopupComponent.stack = PopupComponent.stack.filter(e => e !== this);
   }
 
 
