@@ -34,6 +34,12 @@
   }
 }
 
+.pop-over.is-moving {
+  * {
+    cursor: grabbing !important;
+  }
+}
+
 /* those tends to be built with grids, which adapts viewport but are not
 really meant to be resized, because if they have "free" width, initial
 sizing make them too large. maybe this can be relaxed per-popup */

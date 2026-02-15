@@ -155,7 +155,7 @@ class PopupDetachedComponent extends BlazeComponent {
       if (Math.abs(this.dims().width - width) < this.dims().width / 10 && Math.abs(this.dims().height - height) < this.dims().height / 10) { return }
       if (this.dims().left + width > window.innerWidth || this.dims().top + height > window.innerHeight) {return;}
       // we don't want to run this during something that we have caused, eg. dragging
-      if (!this.mouseDown) {
+      if (!this.pointerDown) {
 
         // if inner shrinks, follow
         if (width < this.dims().width || height < this.dims().height) {
@@ -237,18 +237,18 @@ class PopupDetachedComponent extends BlazeComponent {
       'pointerdown .pop-over'() {
         // Useful to do it now in case of dragging
         this.toFront();
-        this.mouseDown = true;
+        this.pointerDown = true;
       },
       'pointerup .pop-over'() {
-        this.mouseDown = false;
+        this.pointerDown = false;
       }
     };
 
     const movePopup = (event) => {
       event.preventDefault();
-      $(event.target).addClass('is-active');
       const deltaHandleX = this.dims().left - event.clientX;
       const deltaHandleY = this.dims().top - event.clientY;
+      $(this.popup).addClass('is-moving');
 
       const onPointerMove = (e) => {
         // previously I used to resize popup when reaching border but it's a so bad idea, triggers loop
@@ -264,7 +264,7 @@ class PopupDetachedComponent extends BlazeComponent {
       const onPointerUp = (event) => {
         $(document).off('pointermove', onPointerMove);
         $(document).off('pointerup', onPointerUp);
-        $(event.target).removeClass('is-active');
+        $(this.popup).removeClass('is-moving');
       };
 
       if (Utils.shouldIgnorePointer(event)) {
