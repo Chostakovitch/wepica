@@ -240,10 +240,6 @@ Template.minicard.helpers({
     const list = this.list();
     return list ? list.title : '';
   },
-
-  shouldShowListOnMinicard() {
-    return Utils.allowsShowLists();
-  },
 });
 
 BlazeComponent.extendComponent({
