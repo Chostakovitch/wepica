@@ -168,7 +168,7 @@ input[type="submit"].primary:hover,
 button.primary:hover,
 input[type="submit"].primary:focus,
 button.primary:focus {
-  background: #004766;
+  background: #004766 !important;
 }
 input[type="submit"].primary:active,
 button.primary:active {
@@ -185,7 +185,7 @@ input[type="submit"].negate:hover,
 button.negate:hover,
 input[type="submit"].negate:focus,
 button.negate:focus {
-  background: #990f0f;
+  background: #990f0f !important;
   background: linear-gradient(#990f0f, #7d0c0c);
   box-shadow: 0 1px 0 #4d4d4d;
   color: #fff;
