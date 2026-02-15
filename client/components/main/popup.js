@@ -184,24 +184,26 @@ class PopupDetachedComponent extends BlazeComponent {
   }
 
   currentZ(z = undefined) {
-    // relative, add a constant to be above root elements
-    if (z !== undefined && this.firstNode()) {
-      this.firstNode().style.zIndex = parseInt(z) + 10;
+    if (z === undefined) {
+      return this.popup.style.zIndex || 0;
     }
-    return parseInt(this.firstNode().style.zIndex) - 10;
+    if (!z || isNaN(z) ||z === Infinity || z === -Infinity) {
+      z = 1;
+    }
+    // relative, add a constant to be above root elements
+    this.popup.style.zIndex = parseInt(z) + 10;
+    this.popup.style.zIndex - 10;
   }
 
-  // a bit complex...
   toFront() {
     if (!this.isRendered() || !this.firstNode()) {return}
-    // NaN should not happen, but .max will return NaN is it is present; better filter
-    this.currentZ((Math.max(...PopupComponent.stack.map(p => BlazeComponent.getComponentForElement(p.outerView.firstNode?.()).currentZ?.()).filter(e => !isNaN(e))) || 0) + 1);
+    this.currentZ(Math.max(...PopupComponent.stack.map(p => p.outerComponent.currentZ())) + 1);
 
   }
 
   toBack() {
     if (!this.isRendered() || !this.firstNode()) {return}
-    this.currentZ((Math.min(...PopupComponent.stack.map(p => BlazeComponent.getComponentForElement(p.outerView.firstNode?.()).currentZ?.()).filter(e => !isNaN(e))) || 1) - 1);
+    this.currentZ(Math.min(...PopupComponent.stack.map(p => p.outerComponent.currentZ())) + 1);
   }
 
   events() {
@@ -233,6 +235,8 @@ class PopupDetachedComponent extends BlazeComponent {
       },
       // bad heuristic but only for best-effort UI
       'pointerdown .pop-over'() {
+        // Useful to do it now in case of dragging
+        this.toFront();
         this.mouseDown = true;
       },
       'pointerup .pop-over'() {
