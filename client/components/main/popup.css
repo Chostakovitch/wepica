@@ -2,8 +2,12 @@
   background: #fff;
   border-bottom-color: #c2c2c2;
   box-shadow: 0 0.2vh 0.8vh rgba(0, 0, 0, 0.3);
-  /* so they can easily travel with mouse */
-  position: fixed;
+
+  /* absolute positionning is, I believe, less intrusive for users especially for popups.
+  as they are now all draggable by default, users can brings them with us by scrolling if they want to.
+  however it may cause issues with coordinate systems as this kind of things is not my specialty; see
+  PopupDetached for further context.  */
+  position: absolute;
   overflow-x: hidden;
   overflow-y: auto;
   display: flex;
@@ -11,10 +15,14 @@
   align-items: stretch;
   resize: both;
   pointer-events: all;
-  max-height: 100vh;
+  max-height: calc(100vh - 2 * var(--popup-margin));
   border-radius: var(--space-3xs);
   /* minimum for popups, see component */
   z-index: 10;
+
+  &.popup-fullscreen {
+    --popup-margin: 0;
+  }
 
   .content-wrapper {
     width: auto;
@@ -66,7 +74,7 @@ sizing make them too large. maybe this can be relaxed per-popup */
   white-space: nowrap;
   font-size: var(--step-0);
   flex: 1;
-  cursor: grab !important;
+  cursor: grab;
 }
 .pop-over .back-btn {
   float: left;
