@@ -251,14 +251,14 @@ template(name="addListPopup")
       if swimlaneLists.length
         label {{_ 'add-after-list'}}
         select.list-position-input.full-line
-          each swimlaneLists
-            option(value="{{_id}}" selected="{{$eq _id currentListIdValue}}") {{increment @index}} {{title}}
+          each lists
+            option(value="{{_id}}" selected="{{$eq _id currentListIdValue}}") {{title}}
     else
-      if currentBoard.lists.length
+      if lists
         label {{_ 'add-after-list'}}
         select.list-position-input.full-line
-          each currentBoard.lists
-            option(value="{{_id}}" selected="{{$eq _id currentListIdValue}}") {{increment @index}} {{title}}
+          each lists
+            option(value="{{_id}}" selected="{{$eq _id currentListIdValue}}")  {{title}}
     .edit-controls.clearfix
       button.primary.confirm.js-submit-add-list(type="submit") {{_ 'save'}}
       unless currentBoard.isTemplatesBoard

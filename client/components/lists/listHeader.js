@@ -465,21 +465,19 @@ BlazeComponent.extendComponent({
 BlazeComponent.extendComponent({
   onCreated() {
     this.currentBoard = Utils.getCurrentBoard();
-    this.currentSwimlaneId = new ReactiveVar(null);
-    this.currentListId = new ReactiveVar(null);
-
-    // Get the swimlane context from opener
-    const openerData = Popup.getOpenerComponent()?.data();
-
-    // Get swimlane from data,
-    // which is linked by popup
-    this.currentSwimlane = this.currentData();
-    this.currentSwimlaneId.set(this.currentSwimlane._id);
+    // Either we get swimlane data, or list (which have a swimlane ID)
+    this.currentSwimlaneId = new ReactiveVar(this.currentData().swimlaneId ?? this.currentData()._id);
+    // So if we have in a header, take the list id, otherwise take the first of the swimlane
+    this.currentListId = new ReactiveVar(this.currentData().swimlaneId ? this.currentData()._id : this.lists()?.[0]);
   },
 
   currentSwimlaneData() {
     const swimlaneId = this.currentSwimlaneId.get();
     return swimlaneId ? ReactiveCache.getSwimlane({ _id: swimlaneId }) : null;
+  },
+
+  lists() {
+    return ReactiveCache.getSwimlane(this.currentSwimlaneId.get()).myLists().sort((a, b) => a.sort - b.sort);
   },
 
   currentListIdValue() {
@@ -507,25 +505,20 @@ BlazeComponent.extendComponent({
 
           let sortIndex = 0;
           const boardId = Utils.getCurrentBoardId();
-          const swimlaneId = this.currentSwimlane?._id;
+          const swimlaneId = this.currentSwimlaneId;
 
-          const positionInput = this.find('.list-position-input');
+          const listId = this.find('.list-position-input')?.value?.trim?.();
 
-          if (positionInput && positionInput.value) {
-            const positionId = positionInput.value.trim();
-            const selectedList = ReactiveCache.getList({ boardId, _id: positionId, archived: false });
-
+          if (listId) {
+            const selectedList = ReactiveCache.getList({ boardId, _id: listId, archived: false });
             if (selectedList) {
               sortIndex = selectedList.sort + 1;
-            } else {
-              // No specific position, add at end of swimlane
-              if (swimlaneId) {
-                const swimlaneLists = ReactiveCache.getLists({ swimlaneId, archived: false });
-                const lastSwimlaneList = swimlaneLists.sort((a, b) => b.sort - a.sort)[0];
-                sortIndex = Utils.calculateIndexData(lastSwimlaneList, null).base;
-              } else {
-                const lastList = this.currentBoard.getLastList();
-                sortIndex = Utils.calculateIndexData(lastList, null).base;
+              const listsToShift = Array.from(this.lists()).filter(e => e.sort >= sortIndex);
+              for (const list of listsToShift) {
+                Lists.update(
+                  list._id,
+                  { $set: { sort: list.sort + 1 }}
+                );
               }
             }
           } else {
@@ -540,13 +533,14 @@ BlazeComponent.extendComponent({
             }
           }
 
-          Lists.insert({
+          const newListId = Lists.insert({
             title,
             boardId: Session.get('currentBoard'),
             sort: sortIndex,
             type: 'list',
-            swimlaneId: swimlaneId,
+            swimlaneId: swimlaneId.get(),
           });
+          this.currentListId.set(newListId);
 
           // Menu + list
           Popup.back(2);
