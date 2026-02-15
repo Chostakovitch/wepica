@@ -18,15 +18,6 @@ BlazeComponent.extendComponent({
     });
   },
 
-  onRendered() {
-    /* #FIXME I have no idea why this exact same
-    event won't fire when in event maps */
-    $(this.find('.js-collapse')).on('click', (e) => {
-      e.preventDefault();
-      this.collapsed(!this.collapsed());
-    });
-  },
-
   canSeeAddCard() {
     const list = Template.currentData();
     return (
@@ -141,14 +132,13 @@ BlazeComponent.extendComponent({
           this.starred(!this.starred());
         },
         'click .js-open-list-menu': Popup.open('listAction'),
-        'click .js-add-card.list-header-plus-top'(event) {
-          const listDom = $(event.target).parents(
-            `#js-list-${this.currentData()._id}`,
-          )[0];
-          const listComponent = BlazeComponent.getComponentForElement(listDom);
-          listComponent.openForm({
-            position: 'top',
-          });
+        'click .js-add-card.list-header-plus-top': (e) => {
+          // a bit twisted but we don't have obvious links between the two
+          const body = $(e.target).closest('.list-header').siblings().filter('.list-body')?.[0];
+          if (body) {
+            bodyComponent = BlazeComponent.getComponentForElement(body);
+            Popup.afterConfirm("addCardForm", bodyComponent.addCard, bodyComponent, { showHeader: false, confirmArgs: { position: "top" }, handleDOM: ".js-card-title"})(e);
+          }
         },
         'click .js-unselect-list'() {
           Session.set('currentList', null);

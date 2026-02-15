@@ -553,8 +553,7 @@ template(name="boardMenuPopup")
     //        a.js-board-info-on-my-boards(title="{{_ 'board-info-on-my-boards'}}")
     //          i.fa.fa-id-card-o
     //          | {{_ 'board-info-on-my-boards'}}
-  hr
-  ul.pop-over-list
+    hr
     if withApi
       li
         a.js-export-board
@@ -573,14 +572,13 @@ template(name="boardMenuPopup")
         a.js-subtask-settings
           i.fa.fa-globe
           | {{_ 'subtask-settings'}}
-  unless currentBoard.isTemplatesBoard
-    if currentUser.isBoardAdmin
-      hr
-      ul.pop-over-list
-        // li
-        //   a.js-delete-duplicate-lists
-        //     | 🗑️
-        //     | {{_ 'delete-duplicate-lists'}}
+    unless currentBoard.isTemplatesBoard
+      if currentUser.isBoardAdmin
+        hr
+        li
+          a.js-delete-duplicate-lists
+            i.fa.fa-trash
+            | {{_ 'delete-duplicate-lists'}}
         li
           a.js-archive-board
             i.fa.fa-archive

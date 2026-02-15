@@ -265,7 +265,6 @@ textarea::-moz-placeholder {
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: var(--space-3xs);
   button {
     display: flex;
     justify-content: center;
@@ -282,12 +281,21 @@ textarea::-moz-placeholder {
 
 .add-controls {
   grid-area: main-controls;
-  grid-column: auto/-1
+  grid-column: auto/-1;
+  gap: var(--space-3xs);
 }
 
 .links-controls {
   grid-area: links-controls;
-  font-size: var(--step--1);
+  gap: var(--space-xs);
+  a {
+    text-decoration: none !important;
+    border-radius: 6ch;
+    color: #555 !important;
+    &:hover {
+      color: black !important;
+    }
+  }
 }
 
 @media print {

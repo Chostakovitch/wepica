@@ -2,8 +2,6 @@ template(name="listBody")
   unless collapsed
     .list-body(class="{{#unless isVerticalScrollbars}}no-scrollbars{{/unless}}")
       .minicards.clearfix.js-minicards(class="{{#if reachedWipLimit}}js-list-full{{/if}}")
-        +inlinedForm(autoclose=false position="top")
-          +addCardForm(listId=_id position="top")
         if customFieldSum.length
           ul.sidebar-list
             each customFieldsSum
@@ -29,13 +27,9 @@ template(name="listBody")
 
         if canSeeAddCard
           a.minicard-wrapper.minicard-add-form
-            +inlinedForm(autoclose=false position="bottom")
-              +addCardForm(listId=_id position="bottom")
-            else
-              .add-card-wrapper
-                a.open-minicard-composer.js-card-composer.js-open-inlined-form(title="{{_ 'add-card-to-bottom-of-list'}}")
-                  i.fa.fa-plus
-                  | {{_ 'add-card'}}
+              a.open-minicard-composer.add-element.js-card-composer(title="{{_ 'add-card-to-bottom-of-list'}}")
+                i.fa.fa-plus
+                i.fa.fa-sticky-note
 
 template(name="spinnerList")
   .sk-spinner.sk-spinner-list(
@@ -43,28 +37,27 @@ template(name="spinnerList")
     id="showMoreResults")
     +spinnerRaw
 
-template(name="addCardForm")
-  .minicard.minicard-composer.js-composer
+template(name="addCardFormPopup")
+  .minicard-composer.js-composer
     textarea.minicard-composer-textarea.js-card-title(autofocus dir="auto")
     .minicard-bottom
-      .minicard-composer-icons
-        if getLabels
+      if getLabels
+        .minicard-composer-icons
           each getLabels
             .minicard-label(class="card-label-{{color}}" title="{{name}}")
-        if members.get
+      if members.get
+        .minicard-composer-icons
           each members.get
             +userAvatar(userId=this)
       .add-controls.clearfix
-        a.js-close-inlined-form
+        button.negate.js-close
           i.fa.fa-times-thin
-
-        button.primary.confirm(type="submit") {{_ 'add'}}
-
+        button.primary.confirm.js-confirm(type="submit")
+          .fa.fa-plus
   .links-controls.clearfix
     unless currentBoard.isTemplatesBoard
       unless currentBoard.isTemplateBoard
         span.quiet
-          | {{_ 'or'}}
           a.js-link {{_ 'link'}}
         span.quiet
           a.js-search {{_ 'search'}}
