@@ -9,13 +9,13 @@ const hotkeys = require('hotkeys-js').default;
 // CRITICAL: Return values are INVERTED from Mousetrap's stopCallback
 // hotkeys filter: true = ALLOW shortcut, false = STOP shortcut
 hotkeys.filter = (event) => {
+  // Always handle escape
+  if (event.key === "Escape")
+    return true;
+
   // Are shortcuts enabled for the user?
   if (ReactiveCache.getCurrentUser() && !ReactiveCache.getCurrentUser().isKeyboardShortcuts())
     return false;
-
-  // Always handle escape
-  if (event.keyCode === 27)
-    return true;
 
   // Make sure there are no selected characters
   if (window.getSelection().type === "Range")
