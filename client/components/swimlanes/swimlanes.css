@@ -1,5 +1,4 @@
 .swimlane.js-lists{
-.swimlane.js-lists{
   background: #dedede;
   display: flex;
   overflow: auto;
@@ -20,9 +19,7 @@ body.mobile-mode .swimlane {
 
 .swimlane-container {
   background-color: #ccc;
-  display: flex;
-  flex: 1;
-  flex-direction: column;
+  display: grid;
   /* default to the same as lists to avoid contrast with the handle */
   background: #dedede;
 }
@@ -40,6 +37,10 @@ body.mobile-mode .swimlane {
 .swimlane.ui-sortable-helper .swimlane-header.ui-sortable-handle {
   cursor: grabbing;
 }
+.swimlane:has(.swimlane-header-wrap) {
+  grid-row-start: 1;
+  grid-column-start: 1;
+}
 .swimlane .swimlane-header-wrap {
   overflow: hidden;
   display: flex;
@@ -49,7 +50,6 @@ body.mobile-mode .swimlane {
   height: max-content;
   padding: 0.5lh 1ch;
   background-color: #ccc;
-
   position: sticky;
   left: 0;
   p {
@@ -88,9 +88,16 @@ body.mobile-mode .swimlane {
   }
 }
 .swimlane .swimlane-header-wrap .swimlane-header-handle {
-  cursor: move;
+  cursor: grab;
+
+  &:active {
+    cursor: grabbing;
+  }
   pointer-events: auto;
   color: #a6a6a6;
+}
+.swimlane-collapse-indicator {
+  font-size: 1.5em;
 }
 .swimlane .swimlane-header-wrap .swimlane-header-menu-right .swimlane-collapse-indicator:hover {
   background-color: transparent;
@@ -253,9 +260,11 @@ body.mobile-mode {
 .swimlane-resize-handle::before {
   content: '';
   position: absolute;
-  left: 50vw;
-  width: 20px;
-  height: 1px;
+  left: 0;
+  right: 0;
+  margin: auto;
+  width: 2ch;
+  height: 0.1lh;
   background: rgba(0, 0, 0, 0.2);
   border-radius: 5px;
   opacity: 0;

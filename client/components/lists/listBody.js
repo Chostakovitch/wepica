@@ -216,27 +216,24 @@ BlazeComponent.extendComponent({
     return result;
   },
 
-  openForm(options) {
-    options = options || {};
-    options.position = options.position || 'top';
-
-    const forms = this.childComponents('inlinedForm');
-    let form = forms.find(component => {
-      return component.data().position === options.position;
-    });
-    if (!form && forms.length > 0) {
-      form = forms[0];
-    }
-    form.open();
+  idOrNull(swimlaneId) {
+    if (
+      Utils.boardView() === 'board-view-swimlanes' ||
+      this.currentData()
+        .board()
+        .isTemplatesBoard()
+    )
+      return swimlaneId;
+    return undefined;
   },
 
-  addCard(evt) {
+  addCard(evt, args) {
     evt.preventDefault();
     const firstCardDom = this.find('.js-minicard:first');
     const lastCardDom = this.find('.js-minicard:last');
     // more robust to start from the form
-    const textarea = $(evt.currentTarget).closest('.inlined-form').find('textarea');
-    const position = this.currentData().position;
+    const textarea = $(evt.currentTarget).closest('.pop-over').find('textarea');
+    const position = args.position ?? 'bottom';
     const title = $(textarea).val().trim();
 
     let sortIndex;
@@ -246,23 +243,21 @@ BlazeComponent.extendComponent({
       sortIndex = Utils.calculateIndex(lastCardDom, null).base;
     }
 
-    const formComponent = this.cardFormComponent();
-    const members = formComponent.members.get();
-    const labelIds = formComponent.labels.get();
-    const customFields = formComponent.customFields.get();
+    /* can originate from anywhere as long as event is bound to an object with those fields */
+    const source = this.currentComponent();
+    const members = source.members.get();
+    const labelIds = source.labels.get();
+    const customFields = source.customFields.get();
 
-    const board = this.data().board();
-    let linkedId = '';
-    let swimlaneId = '';
+    const board = Utils.getCurrentBoard();
+    let swimlaneId = this.currentData().swimlaneId ?? board.getDefaultSwimline()._id;
     let cardType = 'cardType-card';
+    let linkedId;
     if (title) {
       if (board.isTemplatesBoard()) {
-        swimlaneId = this.parentComponent()
-          .parentComponent()
-          .data()._id; // Always swimlanes view
         const swimlane = ReactiveCache.getSwimlane(swimlaneId);
         // If this is the card templates swimlane, insert a card template
-        if (swimlane.isCardTemplatesSwimlane()) cardType = 'template-card';
+        if (swimlane.isCardTemplatesSwimlane()) {cardType = 'template-card'}
         // If this is the board templates swimlane, insert a board template and a linked card
         else if (swimlane.isBoardTemplatesSwimlane()) {
           linkedId = Boards.insert({
@@ -276,16 +271,7 @@ BlazeComponent.extendComponent({
           });
           cardType = 'cardType-linkedBoard';
         }
-      } else if (Utils.boardView() === 'board-view-swimlanes')
-        swimlaneId = this.parentComponent()
-          .parentComponent()
-          .data()._id;
-      else if (
-        Utils.boardView() === 'board-view-lists' ||
-        Utils.boardView() === 'board-view-cal' ||
-        !Utils.boardView()
-      )
-      swimlaneId = board.getDefaultSwimline()._id;
+      }
 
       const nextCardNumber = board.getNextCardNumber();
 
@@ -294,7 +280,7 @@ BlazeComponent.extendComponent({
         members,
         labelIds,
         customFields,
-        listId: this.data()._id,
+        listId: this.currentData()._id,
         boardId: board._id,
         sort: sortIndex,
         swimlaneId,
@@ -306,9 +292,7 @@ BlazeComponent.extendComponent({
       // if the displayed card count is less than the total cards in the list,
       // we need to increment the displayed card count to prevent the spinner
       // to appear
-      const cardCount = this.data()
-        .cards(this.idOrNull(swimlaneId))
-        .length;
+      const cardCount = this.currentData().cards(swimlaneId).length;
       if (this.cardlimit.get() < cardCount) {
         this.cardlimit.set(this.cardlimit.get() + InfiniteScrollIter);
       }
@@ -325,16 +309,7 @@ BlazeComponent.extendComponent({
         this.scrollToBottom();
       }
     }
-  },
-
-  cardFormComponent() {
-    for (const inlinedForm of this.childComponents('inlinedForm')) {
-      const [addCardForm] = inlinedForm.childComponents('addCardForm');
-      if (addCardForm) {
-        return addCardForm;
-      }
-    }
-    return null;
+    args.popup?.refresh();
   },
 
   scrollToBottom() {
@@ -377,17 +352,6 @@ BlazeComponent.extendComponent({
     evt.stopPropagation();
     evt.preventDefault();
     MultiSelection.toggle(this.currentData()._id);
-  },
-
-  idOrNull(swimlaneId) {
-    if (
-      Utils.boardView() === 'board-view-swimlanes' ||
-      this.data()
-        .board()
-        .isTemplatesBoard()
-    )
-      return swimlaneId;
-    return undefined;
   },
 
   cardsWithLimit(swimlaneId) {
@@ -438,10 +402,7 @@ BlazeComponent.extendComponent({
       {
         'click .js-minicard': this.clickOnMiniCard,
         'click .js-toggle-multi-selection': this.toggleMultiSelection,
-        'click .open-minicard-composer': this.scrollToBottom,
-        submit: this.addCard,
-        // #FIXME remove in final MR if it works
-        'click .confirm': this.addCard
+        'click .open-minicard-composer': Popup.afterConfirm("addCardForm", this.addCard, this, { showHeader: false, handleDOM: ".js-card-title" })
       },
     ];
   },
@@ -474,14 +435,15 @@ function toggleValueInReactiveArray(reactiveValue, value) {
   reactiveValue.set(array);
 }
 
-BlazeComponent.extendComponent({
+class AddCardFormComponent extends BlazeComponent {
   onCreated() {
+    super.onCreated();
     this.labels = new ReactiveVar([]);
     this.members = new ReactiveVar([]);
     this.customFields = new ReactiveVar([]);
 
     const currentBoardId = Session.get('currentBoard');
-    arr = [];
+    let arr = [];
     _.forEach(
       ReactiveCache.getBoard(currentBoardId)
         .customFields(),
@@ -491,13 +453,13 @@ BlazeComponent.extendComponent({
       },
     );
     this.customFields.set(arr);
-  },
+  }
 
   reset() {
     this.labels.set([]);
     this.members.set([]);
     this.customFields.set([]);
-  },
+  }
 
   getLabels() {
     const currentBoardId = Session.get('currentBoard');
@@ -507,60 +469,34 @@ BlazeComponent.extendComponent({
       });
     }
     return false;
-  },
+  }
 
   pressKey(evt) {
     // Pressing Enter should submit the card
     if (evt.keyCode === 13 && !evt.shiftKey) {
       evt.preventDefault();
-      const $form = $(evt.currentTarget).closest('form');
-      // XXX For some reason $form.submit() does not work (it's probably a bug
-      // of blaze-component related to the fact that the submit event is non-
-      // bubbling). This is why we click on the submit button instead -- which
-      // work.
-      $form.find('button[type=submit]').click();
-
-      // Pressing Tab should open the form of the next column, and Maj+Tab go
-      // in the reverse order
-    } else if (evt.keyCode === 9) {
-      // Prevent custom focus movement on Tab key for accessibility
-      // evt.preventDefault();
-      const isReverse = evt.shiftKey;
-      const list = $(`#js-list-${this.data().listId}`);
-      const listSelector = '.js-list:not(.js-list-composer)';
-      let nextList = list[isReverse ? 'prev' : 'next'](listSelector).get(0);
-      // If there is no next list, loop back to the beginning.
-      if (!nextList) {
-        nextList = $(listSelector + (isReverse ? ':last' : ':first')).get(0);
-      }
-
-      BlazeComponent.getComponentForElement(nextList).openForm({
-        position: this.data().position,
-      });
+      this.currentComponent().find('button[type=submit]').click();
     }
-  },
+  }
 
   events() {
-    return [
-      {
-        keydown: this.pressKey,
-        'click .js-link': Popup.open('linkCard'),
-        'click .js-search': Popup.open('searchElement'),
-        'click .js-card-template': Popup.open('searchElement'),
-        submit: this.addCard,
-        'click .minicard-label': (event) => {
-          const clickedData = BlazeComponent.getComponentForElement(event.target).currentData?.()
-          this.labels.set(this.labels.get().filter(e => e !== clickedData?._id));
-        },
-        'click .member': (event) => {
-          const clickedData = BlazeComponent.getComponentForElement(event.target).currentData?.()
-          this.members.set(this.members.get().filter(e => e !== clickedData?.userId));
-          e.preventDefault();
-          e.stopPropagation();
-        },
+    return super.events().concat({
+      'keydown': this.pressKey,
+      'click .js-link': Popup.open('linkCard'),
+      'click .js-search': Popup.open('searchElement'),
+      'click .js-card-template': Popup.open('searchElement'),
+      'click .minicard-label'(event) {
+        const clickedData = BlazeComponent.getComponentForElement(event.target).currentData?.()
+        this.labels.set(this.labels.get().filter(e => e !== clickedData?._id));
       },
-    ];
-  },
+      'click .member'(event) {
+        const clickedData = BlazeComponent.getComponentForElement(event.target).currentData?.()
+        this.members.set(this.members.get().filter(e => e !== clickedData?.userId));
+        e.preventDefault();
+        e.stopPropagation();
+      },
+    });
+  }
 
   onRendered() {
     const editor = this;
@@ -633,25 +569,12 @@ BlazeComponent.extendComponent({
           index: 1,
         },
       ],
-      {
-        // When the autocomplete menu is shown we want both a press of both `Tab`
-        // or `Enter` to validation the auto-completion. We also need to stop the
-        // event propagation to prevent the card from submitting (on `Enter`) or
-        // going on the next column (on `Tab`).
-        /*
-        onKeydown(evt, commands) {
-          // Prevent custom focus movement on Tab key for accessibility
-          // if (evt.keyCode === 9 || evt.keyCode === 13) {
-          //  evt.stopPropagation();
-          //  return commands.KEY_ENTER;
-          //}
-          return null;
-        },
-        */
-      },
+      {},
+      this.firstNode().closest('.pop-over')
     );
-  },
-}).register('addCardForm');
+  }
+}
+AddCardFormComponent.register('addCardFormPopup');
 
 BlazeComponent.extendComponent({
   onCreated() {
@@ -664,10 +587,10 @@ BlazeComponent.extendComponent({
     subManager.subscribe('board', this.boardId, false);
     this.board = ReactiveCache.getBoard(this.boardId);
     // List where to insert card
-    this.list = $(PopupComponent.stack[0].openerElement).closest('.js-list');
+    this.list = $(Popup.stack().at(-1).openerElement).closest('.js-list');
     this.listId = Blaze.getData(this.list[0])._id;
     // Swimlane where to insert card
-    const swimlane = $(PopupComponent.stack[0].openerElement).closest(
+    const swimlane = $(Popup.stack().at(-1).openerElement).closest(
       '.js-swimlane',
     );
     this.swimlaneId = '';
@@ -865,16 +788,16 @@ BlazeComponent.extendComponent({
   },
 
   onCreated() {
-    this.isCardTemplateSearch = $(PopupComponent.stack[0].openerElement).hasClass(
+    this.isCardTemplateSearch = $(Popup.stack().at(-1).openerElement).hasClass(
       'js-card-template',
     );
-    this.isListTemplateSearch = $(PopupComponent.stack[0].openerElement).hasClass(
+    this.isListTemplateSearch = $(Popup.stack().at(-1).openerElement).hasClass(
       'js-list-template',
     );
     this.isSwimlaneTemplateSearch = $(
-      PopupComponent.stack[0].openerElement,
+      Popup.stack().at(-1).openerElement,
     ).hasClass('js-open-add-swimlane-menu');
-    this.isBoardTemplateSearch = $(PopupComponent.stack[0].openerElement).hasClass(
+    this.isBoardTemplateSearch = $(Popup.stack().at(-1).openerElement).hasClass(
       'js-add-board',
     );
     this.isTemplateSearch =
@@ -899,10 +822,10 @@ BlazeComponent.extendComponent({
     this.selectedBoardId = new ReactiveVar(this.boardId);
 
     if (!this.isBoardTemplateSearch) {
-      this.list = $(PopupComponent.stack[0].openerElement).closest('.js-list');
+      this.list = $(Popup.stack().at(-1).openerElement).closest('.js-list');
       this.swimlaneId = '';
       // Swimlane where to insert card
-      const swimlane = $(PopupComponent.stack[0].openerElement).parents(
+      const swimlane = $(Popup.stack().at(-1).openerElement).parents(
         '.js-swimlane',
       );
       if (Utils.boardView() === 'board-view-swimlanes')

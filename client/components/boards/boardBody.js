@@ -315,16 +315,19 @@ BlazeComponent.extendComponent({
       swimlanesSwitcher.attr('aria-label', swimlanesSwitcher.text().trim() || 'Swimlanes');
     }
 
+    /* #FIXME the blue indicator is really difficult to work with, especially because it visually
+    makes padding and margin not what they are without it. Maybe this mode should be configurable
+    via an easy-to-find option. Meanwhile I suggest to at least disable the blue outline */
     // Add a highly visible focus indicator and improve contrast for interactive elements
     if (!document.getElementById('wekan-accessible-focus-style')) {
       const style = document.createElement('style');
       style.id = 'wekan-accessible-focus-style';
       style.innerHTML = `
-        /* Focus indicator */
+        /* Focus indicator
         button:focus, [role="button"]:focus, a:focus, input:focus, select:focus, textarea:focus, .dropdown-menu:focus, .js-board-view-swimlanes:focus, .js-add-card:focus {
           outline: 3px solid #005fcc !important;
           outline-offset: 2px !important;
-        }
+        } */
         /* Input borders */
         input, textarea, select {
           border: 2px solid #222 !important;

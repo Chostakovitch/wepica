@@ -54,7 +54,6 @@
   display: grid;
   grid-auto-flow: row;
   grid-template-rows: min-content 1fr auto auto;
-  gap: 0.4lh;
   background-color: #fff;
   box-shadow: 0 0.2vh 0.3vh rgba(0,0,0,0.15);
   border-radius: 0.3vw;
@@ -62,6 +61,9 @@
   overflow: hidden;
   transition: transform 0.2s, border-radius 0.2s;
   flex: 1;
+  &:not(.minicard-composer) {
+    gap: 0.4lh;
+  }
 }
 
 .minicard-actions-right {
@@ -388,59 +390,71 @@
 
 .minicard-composer {
   display: flex;
-  flex-direction: column;
+  background: unset;
 
   .minicard-composer-icons {
     display: flex;
-    flex-direction: column;
+    padding-inline: 0.5ch;
+    flex-direction: row-reverse;
     align-items: center;
-    gap: 0.2lh;
+    align-self: stretch;
+    max-height: var(--space-m);
+    .member {
+      font-size: var(--step--1);
+      height: var(--space-s);
+      width: var(--space-s);
+    }
   }
 
-  .minicard-bottom {
+  .add-controls {
     display: flex;
-    justify-content: end;
-    align-items: center;
-    gap: 1ch;
-
-    .minicard-composer-icons {
-      display: flex;
-      flex: 1;
-      flex-wrap: wrap;
-      flex-direction: row-reverse;
+    align-self: start;
+    justify-content: center;
+    flex: 1;
+    button {
+      aspect-ratio: 1/1;
+      height: 0.8lh;
     }
+  }
 
-    .add-controls {
-      display: flex;
-      align-self: start;
-    }
+  textarea {
+    display: flex;
+    flex: 1;
+  }
+}
 
-    textarea {
-      display: flex;
-      flex: 1;
-    }
+.minicard-bottom {
+  display: flex;
+  justify-content: end;
+  align-items: center;
+  > .add-controls {
+    /* for once, try small buttons at right of the textarea */
+    flex-direction: column;
+    padding-block: var(--vspace-xs);
+    padding-inline: var(--space-3xs);
   }
 }
 
 .minicard.minicard-composer {
-  flex-wrap: wrap;
   flex: 1;
   align-self: stretch;
-  gap: 0.3lh;
-  padding: 0.5lh 1ch;
+  gap: 0.1lh;
   position: relative;
+
+  .member {
+    align-self: center;
+  }
 }
 
 .minicard.minicard-composer textarea.minicard-composer-textarea,
 .minicard.minicard-composer textarea.minicard-composer-textarea:focus {
   resize: none;
-  background: none;
   border: none;
   box-shadow: none;
   height: auto;
   margin: 0;
   padding: 1ch;
-  min-height: 5lh;
+  min-height: 2lh;
   overflow-y: auto;
   flex: 1;
   width: 100%;

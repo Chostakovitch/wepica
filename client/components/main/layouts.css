@@ -214,7 +214,7 @@ select,
 .js-color-choice,
 .js-reaction,
 .close {
-  min-height: var(--space-m);
+  min-height: var(--space-l);
   font-size: inherit;
 }
 
@@ -950,50 +950,53 @@ Prevents popups to compute real size, trying to comment
 
   commented colors are useful to visualize/debug
   */
-
-  /* those are siblings */
-  :is(hr, .full, .at-error) ~ *, *:has(~hr, full, .at-error) {
-    &:not(:has(hr, .full, .at-error)) {
-      padding-inline: var(--space-xs);
-      &:not(hr) {
-        padding-block: var(--vspace-xs);
-      }
-      /* background: rgba(255, 0, 0, 0.304); */
-    }
-  }
-  /* those are siblings of ancestors */
-  :not(:has(hr, .full, .at-error)), .full {
-    &:has(~ :is(hr, .full, .at-error)) {
-      padding-inline: var(--space-xs);
-      &:not(hr) {
-        padding-block: var(--vspace-xs);
-      }
-      /* background: rgba(0, 0, 255, 0.339); */
-    }
-  }
-
-  /* and when there is not full width element */
-  &:not(:has(:is(hr, .full, .at-error))) {
+  &:not(:has(hr, .full, .at-error)) {
     padding-inline: var(--space-xs);
-    &:not(hr) {
-      padding-block: var(--vspace-xs);
-    }
-    /* background: rgba(0, 128, 0, 0.34); */
-  }
-
-  /* they can be padded from "root" once, so background apply until borders */
-  .full, .at-error {
-    padding-inline: var(--space-xs);
-    padding-block: var(--vspace-xs);
-    /* background: rgba(238, 130, 238, 0.336); */
-  }
-
-  .full:is(:first-child, :last-child) {
-    border-radius: 0;
     padding-block: var(--vspace-l);
   }
-}
+  > *:has(hr, .full, .at-error) {
+    /* those are siblings */
+    :is(hr, .full, .at-error) ~ *, *:has(~hr, full, .at-error) {
+      &:not(:has(hr, .full, .at-error)) {
+        padding-inline: var(--space-xs);
+        &:not(hr) {
+          padding-block: var(--vspace-xs);
+        }
+        /* background: rgba(255, 0, 0, 0.304); */
+      }
+    }
+    /* those are siblings of ancestors */
+    :not(:has(hr, .full, .at-error)), .full {
+      &:has(~ :is(hr, .full, .at-error)) {
+        padding-inline: var(--space-xs);
+        &:not(hr) {
+          padding-block: var(--vspace-xs);
+        }
+        /* background: rgba(0, 0, 255, 0.339); */
+      }
+    }
 
+    /* and when there is not full width element */
+    &:not(:has(:is(hr, .full, .at-error))) {
+      padding-inline: var(--space-xs);
+      &:not(hr) {
+        padding-block: var(--vspace-xs);
+      }
+      /* background: rgba(0, 128, 0, 0.34); */
+    }
+  }
+
+
+  /* they can be padded from "root" once, so background apply until borders
+  but no do apply in case the full element is the root one */
+  > .full:is(:first-child, :last-child), :is(.full, .at-error), :only-child:is(.full, .at-error) {
+    padding-inline: var(--space-xs);
+    padding-block: var(--vspace-xs);
+    /* rounded button in full width is strange; but the rule is loose so is may break other things */
+    border-radius: 0;
+    /* background: rgba(238, 130, 238, 0.336); */
+  }
+}
 .pop-over-list, .table-grid {
   display: grid !important;
   /* I am not a grid expert, but I think the number of columns is not
@@ -1001,10 +1004,9 @@ Prevents popups to compute real size, trying to comment
   you can set this variable for a specific layout.*/
   grid-template-columns: var(--t-columns, repeat(var(--n-columns, 4), minmax(0, auto)));
   /* no need to apply .row if structured with lists, or with ul>li>a>[actual row].
-  this last case is to try to adapt to a common structure out there, but we make sure
-  that content is inside `a` by using :only-child. */
+  this last case is to try to adapt to a common structure out there */
   * > :is(.row, li),
-  .row, li, li>:only-child {
+  .row, li > a, li:not(:has(a)) {
     display: grid !important;
     /* subgrid just says to use the tracks of parent grid;
     1/-1 makes the row span all columns. so we get a table effect,
@@ -1013,16 +1015,15 @@ Prevents popups to compute real size, trying to comment
     grid-template-columns: subgrid;
     justify-items: start;
     place-content: center;
-    column-gap: var(--space-s);
+    justify-self: stretch;
     grid-column: 1/-1;
-    > {
-      display: grid;
-      grid-template-columns: subgrid;
-      grid-column: auto;
-      &:last-child {
-        grid-column: auto/-1;
-      }
-    }
+    /* nested grids have behaviour I do not understand, so make sure to be set at minimum width */
+    min-width: min-content;
+  }
+  li:has(a) {
+    display: grid !important;
+    grid-template-columns: subgrid;
+    grid-column: 1/-1;
   }
   hr, .full {
     grid-column: 1/-1;

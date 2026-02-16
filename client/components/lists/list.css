@@ -41,18 +41,6 @@
   box-sizing: border-box;
 }
 
-.add-card-wrapper {
-  display: flex;
-  flex: 1;
-  justify-content: center;
-  align-items: stretch;
-  min-height: 2lh;
-  > {
-    display: flex;
-    align-items: center;
-  }
-}
-
 /* Show resize handle only on hover */
 .list:hover .list-resize-handle, .list.list-resizing .list-resize-handle {
   background: rgba(0, 123, 255, 0.2);
@@ -127,13 +115,6 @@ body.mobile-mode {
   }
 }
 
-.list-header-add {
-  display: flex;
-  justify-content: center;
-  >.inlined-form {
-    padding: 1ch;
-  }
-}
 .list-header:not(.open-list-composer) {
   overflow: hidden !important;
   display: flex;
@@ -187,11 +168,11 @@ body.mobile-mode {
     text-overflow: ellipsis;
   }
 }
+.open-list-composer {
+  justify-content: start;
+}
 
 .mini-list {
-  .list-header {
-    padding: 0.5lh 2ch;
-  }
   .list-header-name-container {
     /* on mobile, put card count below list name for a nice alignement effect */
     grid-auto-flow: row;
@@ -218,8 +199,11 @@ body.mobile-mode {
 .list-header .list-header-handle {
   align-self: end;
   /* Ensure it's clickable and shows proper cursor */
-  cursor: move !important;
+  cursor: grab !important;
   pointer-events: auto !important;
+  &:active {
+    cursor: grabbing;
+  }
 }
 
 .list:not:has(.list-header-add) {
@@ -232,11 +216,10 @@ body.mobile-mode {
   height: 100%;
 }
 
-.list.list-composer {
-  display: flex;
+body.mobile-mode .list.list-composer {
+  grid-row-start: 3;
   justify-content: center;
-  min-width: 4ch;
-  padding-top: 0.5lh;
+  padding: 0.3lh 0;
 }
 .list.list-auto-width {
   flex: 1;
@@ -276,19 +259,13 @@ body.mobile-mode {
   /* spans the whole swimlane */
   flex: 1;
 }
-
-.list.list-composer .open-list-composer,
-.list .list-composer .open-list-composer {
-  color: #8c8c8c;
-  min-width: max-content;
-  align-items: center;
-}
 .list.list-composer .list-name-input,
 .list .list-composer .list-name-input {
   background: #fff;
   display: flex;
   flex: 1;
   max-height: 2lh;
+  align-self: center;
 }
 .list-rotated {
   flex: 1;
@@ -304,7 +281,6 @@ body.mobile-mode .list-collapsed:nth-child(2n-2) > .list-header {
 }
 
 .list-header .list-header-watch-icon {
-  padding-left: 10px;
   color: #a6a6a6;
 }
 @media print {
@@ -313,31 +289,14 @@ body.mobile-mode .list-collapsed:nth-child(2n-2) > .list-header {
     display: none;
   }
 }
-.list-header .list-header-plus-top {
-  color: #a6a6a6;
-  vertical-align: middle;
-  line-height: 1.2;
-}
 .list-header .list-header-collapse-right {
   color: #a6a6a6;
 }
 .list-header .list-header-collapse-left {
   color: #a6a6a6;
-  margin-right: 15px;
 }
 .list-header .list-header-name-container p {
   margin: 0;
-}
-
-.list-header .js-collapse {
-  position: absolute !important;
-  top: 5px !important;
-  left: 10px !important;
-  color: #a6a6a6;
-  border: none;
-  border-radius: 0;
-  background-color: transparent;
-  text-decoration: none;
 }
 .list-header .js-collapse:hover {
   background-color: transparent;
@@ -412,8 +371,6 @@ body.mobile-mode .list-collapsed:nth-child(2n-2) > .list-header {
   gap: 0.5lh;
   display: flex;
   flex-direction: column;
-  /** get card drag/drop working for empty swimlanes */
-  min-height: 10vh;
 }
 .list-body .minicards form {
   display: flex;
@@ -425,21 +382,6 @@ body.mobile-mode .list-collapsed:nth-child(2n-2) > .list-header {
   .list-body .open-minicard-composer {
     display: none;
   }
-}
-
-.list-body .open-minicard-composer {
-  display: flex;
-  flex: 1;
-  border-radius: 0.4ch;
-  justify-content: center;
-  align-items: center;
-  font-size: 1.2em;
-  gap: 1ch;
-}
-body.mobile-mode .list-body .open-minicard-composer, .list-body .open-minicard-composer:hover {
-  background: #fafafa;
-  color: #222;
-  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
 }
 #js-wip-limit-edit {
   padding-top: 2%;

@@ -7,11 +7,6 @@ const { calculateIndex } = Utils;
 export const itemsSelector = '.js-minicard:not(.placeholder, .js-card-composer)';
 
 BlazeComponent.extendComponent({
-  // Proxy
-  openForm(options) {
-    this.childComponents('listBody')[0].openForm(options);
-  },
-
   onCreated() {
     this.newCardFormIsVisible = new ReactiveVar(true);
     this.collapse = new ReactiveVar(Utils.getListCollapseState(this.data()));

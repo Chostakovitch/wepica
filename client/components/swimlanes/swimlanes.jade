@@ -17,9 +17,6 @@ template(name="swimlane")
               +list(this)
       //- allow resizing in mobile mode
       .swimlane-resize-handle.js-swimlane-resize-handle.nodragscroll
-      if currentUser.isBoardMember
-        unless currentUser.isCommentOnly
-          +addListForm
 
 template(name="listsGroup")
   .swimlane.list-group.js-lists.dragscroll
@@ -31,10 +28,6 @@ template(name="listsGroup")
         if visible this
           +list(this)
     .swimlane-resize-handle.js-swimlane-resize-handle.nodragscroll
-    //- Placed with grids
-    if currentUser.isBoardMember
-      unless currentUser.isCommentOnly
-        +addListForm
 
 template(name="addListForm")
   unless currentUser.isWorker
@@ -42,29 +35,9 @@ template(name="addListForm")
       unless currentUser.isReadOnly
         unless currentUser.isReadAssignedOnly
           .list.list-composer.js-list-composer(class="{{#if isMiniScreen}}mini-list{{/if}}")
-            .list-header-add
-              +inlinedForm(autoclose=false)
-                input.list-name-input.full-line(type="text" placeholder="{{_ 'add-list'}}"
-                  autocomplete="off" autofocus)
-                if lists
-                  | {{_ 'add-after-list'}}
-                  select.list-position-input.full-line
-                    each lists
-                      option(value="{{_id}}" selected=currentBoard.getLastList.title) {{title}}
-                .edit-controls.clearfix
-                  button.primary.confirm(type="submit") {{_ 'save'}}
-                  a.js-close-inlined-form
-                    i.fa.fa-times-thin
-                  unless currentBoard.isTemplatesBoard
-                    unless currentBoard.isTemplateBoard
-                      span.quiet
-                        | {{_ 'or'}}
-                        a.js-list-template {{_ 'template'}}
-              else
-                a.open-list-composer.list-header.js-open-add-card-popup(title="{{_ 'add-list'}}")
-                  i.fa.fa-plus
-                unless isMiniScreen
-                  | {{_ 'add-list'}}
+            a.open-list-composer.add-element.js-open-add-card-popup(title="{{_ 'add-list'}}")
+              i.fa.fa-plus
+              i.fa.fa-trello
 
 template(name="moveSwimlanePopup")
   if currentUser

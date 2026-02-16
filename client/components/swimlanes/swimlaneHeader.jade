@@ -17,7 +17,11 @@ template(name="swimlaneFixedHeader")
             if collapseSwimlane
               i.fa.fa-caret-right
             else
-              i.fa.fa-caret-down
+                i.fa.fa-caret-down
+          if currentUser.isBoardMember
+            unless currentUser.isCommentOnly
+              unless isMiniScreen
+                +addListForm
   .swimlane-header(
       class="{{#if currentUser.isBoardMember}}js-open-inlined-form is-editable{{/if}}")
         if $eq title 'Card Templates'
@@ -37,10 +41,12 @@ template(name="swimlaneFixedHeader")
         unless currentUser.isReadOnly
           unless currentUser.isReadAssignedOnly
             unless currentUser.isWorker
+              unless isMiniScreen
+                a.js-open-add-swimlane-menu.add-element.swimlane-header-plus-icon(title="{{_ 'add-swimlane'}}")
+                  i.fa.fa-plus
+                  i.fa.fa-th-large
               a.js-open-swimlane-menu(title="{{_ 'swimlaneActionPopup-title'}}")
                 i.fa.fa-bars
-              a.js-open-add-swimlane-menu.swimlane-header-plus-icon(title="{{_ 'add-swimlane'}}")
-                i.fa.fa-plus
               if isMiniScreen
                 a.swimlane-header-miniscreen-handle.handle.js-swimlane-header-handle
                   i.fa.fa-arrows
