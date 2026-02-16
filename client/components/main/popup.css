@@ -304,4 +304,20 @@ body.mobile-mode .pop-over .content>form {
   &[data-popup="deleteAvatarPopup"] {
     width: 30ch;
   }
+
+  &[data-popup="addCardFormPopup"] {
+    background: transparent;
+    border: none;
+    box-shadow: none;
+    resize: none;
+    .content {
+      textarea {
+        border-radius: 0;
+        cursor: grab;
+      }
+      button {
+        flex: 0;
+      }
+    }
+  }
 }

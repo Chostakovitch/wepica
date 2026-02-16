@@ -103,19 +103,6 @@ template(name="listActionPopup")
     unless currentUser.isReadOnly
       unless currentUser.isReadAssignedOnly
         li
-          a.js-add-card.list-header-plus-top
-            span
-              i.fa.fa-plus
-              i.fa.fa-arrow-up
-            | {{_ 'add-card-to-top-of-list'}}
-        li
-          a.js-add-card.list-header-plus-bottom
-            span
-              i.fa.fa-plus
-              i.fa.fa-arrow-down
-            | {{_ 'add-card-to-bottom-of-list'}}
-        hr
-        li
           a.js-add-list
             i.fa.fa-plus
             | {{_ 'add-list'}}
@@ -143,7 +130,7 @@ template(name="listActionPopup")
           if cards.length
             li
               a.js-select-cards
-                i.fa.fa-select-square
+                i.fa.fa-check-square
                 | {{_ 'list-select-cards'}}
         if currentUser.isBoardAdmin
             li
@@ -155,7 +142,6 @@ template(name="listActionPopup")
             li
               a.js-close-list
                 span
-                  i.fa.fa-arrow-right
                   i.fa.fa-archive
                 | {{_ 'archive-list'}}
             hr

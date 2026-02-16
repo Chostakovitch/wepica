@@ -950,6 +950,10 @@ Prevents popups to compute real size, trying to comment
 
   commented colors are useful to visualize/debug
   */
+  &:not(:has(hr, .full, .at-error)) {
+    padding-inline: var(--space-xs);
+    padding-block: var(--vspace-l);
+  }
   > *:has(hr, .full, .at-error) {
     /* those are siblings */
     :is(hr, .full, .at-error) ~ *, *:has(~hr, full, .at-error) {
@@ -1000,10 +1004,9 @@ Prevents popups to compute real size, trying to comment
   you can set this variable for a specific layout.*/
   grid-template-columns: var(--t-columns, repeat(var(--n-columns, 4), minmax(0, auto)));
   /* no need to apply .row if structured with lists, or with ul>li>a>[actual row].
-  this last case is to try to adapt to a common structure out there, but we make sure
-  that content is inside `a` by using :only-child. */
+  this last case is to try to adapt to a common structure out there */
   * > :is(.row, li),
-  .row, li, li>:only-child {
+  .row, li > a, li:not(:has(a)) {
     display: grid !important;
     /* subgrid just says to use the tracks of parent grid;
     1/-1 makes the row span all columns. so we get a table effect,
@@ -1012,16 +1015,15 @@ Prevents popups to compute real size, trying to comment
     grid-template-columns: subgrid;
     justify-items: start;
     place-content: center;
-    column-gap: var(--space-2xs);
+    justify-self: stretch;
     grid-column: 1/-1;
-    > {
-      display: grid;
-      grid-template-columns: subgrid;
-      grid-column: auto;
-      &:last-child {
-        grid-column: auto/-1;
-      }
-    }
+    /* nested grids have behaviour I do not understand, so make sure to be set at minimum width */
+    min-width: min-content;
+  }
+  li:has(a) {
+    display: grid !important;
+    grid-template-columns: subgrid;
+    grid-column: 1/-1;
   }
   hr, .full {
     grid-column: 1/-1;
