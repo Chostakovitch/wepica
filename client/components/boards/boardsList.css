@@ -643,6 +643,10 @@ body.grey-icons-enabled .board-list.is-multiselection-active .js-board.is-checke
   grid-auto-rows: 3lh;
   justify-items: stretch;
   gap: 1ch;
+
+  .fa-check {
+    color: #f2f2f2 !important;
+  }
 }
 
 .board-backgrounds-list .board-background-select {

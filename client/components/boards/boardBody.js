@@ -684,6 +684,9 @@ BlazeComponent.extendComponent({
         scrollTop: position,
       });
   },
+  colorClass() {
+    return Utils.getColorClass();
+  }
 }).register('boardBody');
 
 // Accessibility: Allow users to enable/disable keyboard shortcuts

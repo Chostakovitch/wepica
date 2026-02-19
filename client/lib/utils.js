@@ -47,6 +47,10 @@ Utils = {
     const ret = ReactiveCache.getBoard(boardId);
     return ret;
   },
+  getColorClass() {
+    // if we are outside a board view, find a color used in a board to keep a bit of color everywhere
+    return Utils.getCurrentBoard()?.colorClass() ?? ReactiveCache.getBoards().find(e => e.colorClass())?.colorClass();
+  },
   getCurrentCard(ignorePopupCard = false) {
     const cardId = Utils.getCurrentCardId(ignorePopupCard);
     const ret = ReactiveCache.getCard(cardId);
