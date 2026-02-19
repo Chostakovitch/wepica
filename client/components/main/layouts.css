@@ -950,52 +950,76 @@ Prevents popups to compute real size, trying to comment
 
   commented colors are useful to visualize/debug
   */
-  &:not(:has(hr, .full, .at-error)) {
+  &:not(:has(hr, .full)) {
     padding-inline: var(--space-xs);
     padding-block: var(--vspace-l);
+
+    &:is(input) {
+      margin-inline: var(--space-xs);
+    }
   }
-  > *:has(hr, .full, .at-error) {
+  &> *:has(hr, .full) {
     /* those are siblings */
-    :is(hr, .full, .at-error) ~ *, *:has(~hr, full, .at-error) {
-      &:not(:has(hr, .full, .at-error)) {
+      :where(hr, .full) ~ *, *:has(~hr, .full) {
+      &:not(:has(hr, .full)){
         padding-inline: var(--space-xs);
         &:not(hr) {
           padding-block: var(--vspace-xs);
+        }
+        &:is(input) {
+          margin-inline: var(--space-xs);
         }
         /* background: rgba(255, 0, 0, 0.304); */
       }
     }
     /* those are siblings of ancestors */
-    :not(:has(hr, .full, .at-error)), .full {
-      &:has(~ :is(hr, .full, .at-error)) {
+    :not(:has(hr, .full), .full) {
+      &:has(~ :is(hr, .full)) {
         padding-inline: var(--space-xs);
         &:not(hr) {
           padding-block: var(--vspace-xs);
+        }
+        &:is(input) {
+          margin-inline: var(--space-xs);
         }
         /* background: rgba(0, 0, 255, 0.339); */
       }
     }
 
     /* and when there is not full width element */
-    &:not(:has(:is(hr, .full, .at-error))) {
+    &:not(:has(:where(hr, .full))) {
       padding-inline: var(--space-xs);
       &:not(hr) {
         padding-block: var(--vspace-xs);
+      }
+      &:is(input) {
+        margin-inline: var(--space-xs);
       }
       /* background: rgba(0, 128, 0, 0.34); */
     }
   }
 
-
-  /* they can be padded from "root" once, so background apply until borders
-  but no do apply in case the full element is the root one */
-  > .full:is(:first-child, :last-child), :is(.full, .at-error), :only-child:is(.full, .at-error) {
+  /* pad full element once */
+  .full {
     padding-inline: var(--space-xs);
     padding-block: var(--vspace-xs);
     /* rounded button in full width is strange; but the rule is loose so is may break other things */
-    border-radius: 0;
-    /* background: rgba(238, 130, 238, 0.336); */
+    border-radius: 0 !important;
+    border: none;
+    /* background: rgba(238, 110, 238, 0.336); */
   }
+  /* remove vertical padding for root element which have a full one start or end*/
+  > *:has(.full) {
+    &:where(:first-child, :last-child), &:where(.full), &.full:where(:only-child), &:not(:has(.full)) {
+      padding-block: 0;
+      margin-block: 0;
+      /* background: rgba(173, 196, 3, 0.63); */
+    }
+  }
+}
+.pop-over:has(.full) {
+  box-shadow: none;
+  border: none;
 }
 .pop-over-list, .table-grid {
   display: grid !important;
