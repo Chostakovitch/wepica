@@ -10,7 +10,7 @@ form {
 select,
 textarea,
 input:not([type=file]),
-button {
+button, .emphasis-button {
   box-sizing: border-box;
   background-color: #ebebeb;
   border: 1px solid #ccc;
@@ -559,34 +559,8 @@ button.loud-text-button:hover {
   position: relative;
   justify-content: center;
 }
-.emphasis-button.w-img,
-.quiet-button.w-img {
-  padding-left: 28px;
-}
-.emphasis-button:hover,
-.quiet-button:hover {
-  color: #4d4d4d;
-  background: #dcdcdc;
-}
-.emphasis-button:active,
-.quiet-button:active {
-  color: #4d4d4d;
-  background: #d3d3d3;
-}
 .quiet-button-large {
   padding: 16px 24px;
-}
-.emphasis-button {
-  color: #74663e;
-  background: #ecdfbb;
-}
-.emphasis-button:hover {
-  color: #53492d;
-  background: #e7d6a7;
-}
-.emphasis-button:active {
-  color: #53492d;
-  background: #e1cc93;
 }
 .is-editable {
   cursor: pointer;

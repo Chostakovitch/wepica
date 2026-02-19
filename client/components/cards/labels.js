@@ -50,17 +50,7 @@ BlazeComponent.extendComponent({
       connectWith: '.edit-labels-pop-over',
       tolerance: 'pointer',
       appendTo: '.edit-labels-pop-over',
-      helper(element, currentItem) {
-        let ret = currentItem.clone();
-        if (currentItem.closest('.popup-container-depth-0').length == 0)
-        { // only set css transform at every sub-popup, not at the main popup
-          const content = currentItem.closest('.content')[0]
-          const offsetLeft = content.offsetLeft;
-          const offsetTop = $('.pop-over > .header').height() * -1;
-          ret.css("transform", `translate(${offsetLeft}px, ${offsetTop}px)`);
-        }
-        return ret;
-      },
+      helper: 'clone',
       distance: 7,
       items: itemsSelector,
       placeholder: 'card-label-wrapper placeholder',

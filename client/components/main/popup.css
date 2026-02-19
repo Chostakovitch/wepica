@@ -153,17 +153,18 @@ body.mobile-mode  {
   margin-left: 0;
   padding-left: 0;
   display: grid;
-  grid-auto-flow: dense;
-  grid-template-columns: repeat(auto-fill, 4.5ch);
-  grid-auto-rows: 4.5ch;
-  justify-content: stretch;
-  justify-items: stretch;
+  grid-template-columns: repeat(5, var(--space-xl));
+  grid-auto-rows: var(--space-xl);
+  place-content: center;
+  place-items: stretch;
+  margin-block: var(--vspace-l);
 }
 
 /* Color palette items: ensure proper positioning */
 .pop-over .content .palette-colors .palette-color {
-  margin: 0;
-  border-radius: 0;
+  display: flex;
+  place-content: center;
+  place-items: center;
   outline: 0.1ch solid black;
 }
 .pop-over.search-over {
