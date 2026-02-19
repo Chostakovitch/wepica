@@ -6,15 +6,22 @@
 }
 .editor-controls {
   display: flex;
-  justify-content: end;
-  grid-area: editor-controls;
+  flex-direction: column;
+  justify-content: center;
   align-items: center;
   gap: 1ch;
   flex: 1;
   align-self: stretch;
   justify-self: center;
+  gap: var(--space-2xs);
 }
 
 .editor {
   grid-area: editor;
+}
+
+form:has(.editor) {
+  display: flex;
+  flex-direction: row;
+  gap: var(--space-2xs);
 }

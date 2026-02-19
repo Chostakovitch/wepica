@@ -341,34 +341,7 @@ BlazeComponent.extendComponent({
           PopupComponent.toBack(event);
         },
         'click .js-close-card-details'() {
-          // Get board ID from either the card data or current board in session
-          const card = this.currentData() || this.data();
-          const boardId = (card && card.boardId) || Utils.getCurrentBoard()._id;
-          const cardId = card && card._id;
-
-          if (boardId && cardId) {
-            const openCards = Session.get('openCards') || [];
-            const filtered = openCards.filter(id => id !== cardId);
-            // If this was the current card, clear it
-            if (openCards.length === filtered.length) {
-              Session.set('currentCard', null);
-            }
-            else {
-              Session.set('currentCard', filtered[0]);
-            }
-            Session.set('openCards', filtered);
-
-            // Navigate back to board without card: must be done at the time of writing
-            // otherwise the route for the card is disabled until another
-            // card is opened
-            const board = ReactiveCache.getBoard(boardId);
-            if (board) {
-              FlowRouter.go('board', {
-                id: board._id,
-                slug: board.slug,
-              });
-            }
-          }
+          Utils.manageCurrentCard()
         },
         'click .js-copy-link'(event) {
           event.preventDefault();
@@ -446,7 +419,7 @@ BlazeComponent.extendComponent({
         'click .js-add-members': Popup.open('cardMembers'),
         'click .js-assignee': Popup.open('cardAssignee'),
         'click .js-add-assignees': Popup.open('cardAssignees'),
-        'click .js-add-labels'(event) {Popup.open('cardLabels')(event, { dataContextIfCurrentDataIsUndefined: this.currentData() })},
+        'click .js-add-labels'(event) {Popup.open('cardLabels')(event)},
         'click .js-received-date': Popup.open('editCardReceivedDate'),
         'click .js-start-date': Popup.open('editCardStartDate'),
         'click .js-due-date': Popup.open('editCardDueDate'),
@@ -1885,9 +1858,9 @@ Template.cardDetailsPopup.helpers({
       name: "cardDetails",
       showHeader: false,
       closeDOMs: ["click .js-close-card-details"],
-      followDOM: ".card-details",
       handleDOM: ".card-header-middle",
-      closeVar: "currentCard"
+      closeVar: "currentCard",
+      onDestroy: Utils.manageCurrentCard
     }
   },
 });

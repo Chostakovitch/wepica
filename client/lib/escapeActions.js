@@ -1,4 +1,4 @@
-const hotkeys = require('hotkeys-js').default;
+import hotkeys from 'hotkeys-js';
 
 // Pressing `Escape` should close the last opened "element" and only the last
 // one. Components can register themselves using a label a condition, and an
@@ -124,6 +124,11 @@ EscapeActions = {
 // Pressing escape to execute one escape action. ESC is allowed globally
 // in the hotkeys filter (keyboard.js) so it works in textarea and inputs.
 hotkeys('escape', () => {
+  // sometimes a lot of keys from card is selected by mistake, especially
+  // when redimensionning, some bugs on moving etc. this makes selection go,
+  // as one could expect with escape
+  if (window.getSelection) { window.getSelection().removeAllRanges(); }
+  else if (document.selection) { document.selection.empty(); }
   EscapeActions.executeLowest();
   Sidebar.hide();
 });

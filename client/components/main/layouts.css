@@ -204,6 +204,12 @@ but it makes a reasonable default */
   gap: var(--vspace-s) var(--space-s);
   padding: var(--vspace-s) var(--space-s);
   z-index: 100;
+  &.horizontal {
+    grid-template-areas: ".....main-controls";
+    justify-content: start;
+    padding: 0;
+    gap: var(--space-3xs);
+  }
 }
 
 button,

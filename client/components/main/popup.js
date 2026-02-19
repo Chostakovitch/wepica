@@ -380,7 +380,15 @@ class PopupDetachedComponent extends BlazeComponent {
       popupHeight += headerRect.scrollHeight;
       popupWidth = Math.max(popupWidth, headerRect.scrollWidth)
     }
-    return { width: Math.max(popupWidth, $(this.popup).width()), height: Math.max(popupHeight, $(this.popup).height()) };
+    // some popups go naturally really wide because of inner text. make an exception for those and lie
+    let width = Math.max(popupWidth, $(this.popup).width());
+    let height = Math.max(popupHeight, $(this.popup).height());
+    if (height < window.innerHeight / 4 && width > Math.min(500, 4 * window.innerWidth / 5)) {
+      width = Math.min(300, window.innerWidth / 3);
+      $(this.popup).css('width', `${width}px`);
+      height = $(this.popup).height();
+    }
+    return { width, height };
   }
 
   placeOnSingleDimension(elementLength, openerPos, openerLength, maxLength, biases, n) {
@@ -517,6 +525,7 @@ class PopupDetachedComponent extends BlazeComponent {
         popupWidth = this.referenceViewportWidth - 2 * this.margin();
         candidateX = window.scrollX + this.margin();
       }
+
       return ({
         width: popupWidth,
         height: popupHeight,
@@ -844,7 +853,7 @@ class PopupComponent extends BlazeComponent {
     // not necesserly removed in order, e.g. multiple cards
     PopupComponent.stack = PopupComponent.stack.filter(e => e !== this);
     if (renderParent) {
-      PopupComponent.refresh();
+      PopupComponent.stack.at(-1).refresh();
     }
 
     // unecessary upon "normal" conditions, but prefer destroy everything

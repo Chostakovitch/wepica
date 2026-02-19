@@ -34,7 +34,6 @@
   display: flex;
   flex-direction: column;
   flex: 1;
-  padding: 2ch;
   align-items: stretch;
   gap: 0.5lh;
   /* for popups */
@@ -46,11 +45,16 @@
     /* better use a grid, otherwise flexbox will not expand left pane if fullscreen
     > max-content, but some users may want to expend elements anyways */
     grid-template-columns: 3fr 1fr;
+
     .card-details-left {
       border-right: solid 2px #dbdbdb;
       padding-right: 2ch;
     }
   }
+}
+
+body.mobile-mode .card-body {
+  padding: 0.5lh 0;
 }
 
 .card-header-content {
@@ -62,12 +66,14 @@
   align-items: center;
   min-height: 2lh;
   gap: 1ch;
+  flex: 1;
 }
 
 body.mobile-mode {
   .card-header-content {
     padding-inline: 0.5ch;
   }
+
   .card-header-middle {
     padding-inline: 0;
     background: unset;
@@ -81,16 +87,16 @@ body.mobile-mode {
   font-size: 1.3em;
   justify-content: center;
   align-items: center;
-  background: #dfdfdf;
-  border-radius: 1ch;
   padding-inline: 1ch;
   justify-self: stretch;
   cursor: grab !important;
 }
+
 .assignee.add-assignee:hover,
 .assignee.add-assignee.is-active {
   box-shadow: 0 0 0 2px #666 inset;
 }
+
 .assignee {
   box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.04);
 }
@@ -111,18 +117,22 @@ body.mobile-mode {
   background: #64c464;
   border-color: #daf1da;
 }
+
 .assignee .assignee-presence-status.idle {
   background: #e4e467;
   border-color: #f7f7d4;
 }
+
 .assignee .assignee-presence-status.disconnected {
   background: #bdbdbd;
   border-color: #ededed;
 }
+
 .assignee .assignee-presence-status.pending {
   background: #e44242;
   border-color: #f1dada;
 }
+
 .assignee.add-assignee {
   display: flex;
   align-items: center;
@@ -138,9 +148,10 @@ body.mobile-mode {
   align-items: center;
   justify-items: center;
 }
+
 .copied-tooltip {
   position: absolute;
-  background-color: rgba(0,0,0,0.875);
+  background-color: rgba(0, 0, 0, 0.875);
   color: #fff;
   border-radius: 0.7vw;
   font-size: 0.98em;
@@ -157,6 +168,7 @@ body.mobile-mode {
   opacity: 0;
   transition: visibility 0s 0.1s, opacity 0.1s linear;
 }
+
 .card-details {
   padding: 0;
   display: flex;
@@ -170,6 +182,7 @@ body.mobile-mode {
   box-shadow: 0 0 0.9vh 0 #b3b3b3;
   transition: flex-basis 0.1s, box-shadow 0.15s;
   box-sizing: border-box;
+
   &:not(.collapsed) {
     min-height: 20lh;
     /* at this point, popup can still be resized but stops
@@ -181,13 +194,15 @@ body.mobile-mode {
 .edit-vote-question {
   display: flex;
   flex-direction: column;
-  & > .fields {
+
+  &>.fields {
     display: flex;
     flex-direction: column;
     gap: 0.2lh;
     margin: 0.2lh 0;
   }
 }
+
 .card-details .card-details-canvas {
   display: grid;
   background: #ededed;
@@ -199,13 +214,16 @@ body.mobile-mode {
   align-items: stretch;
   align-content: center;
 }
+
 /* Collapsed card state - hide content and set height to title row only */
-.card-details.card-details.collapsed .card-details-canvas > *:not(.card-details-header) {
+.card-details.card-details.collapsed .card-details-canvas>*:not(.card-details-header) {
   display: none !important;
 }
+
 .card-details .mCustomScrollBox {
   padding-left: 0;
 }
+
 .card-details .card-details-header .card-number {
   color: #b3b3b3;
   display: inline-block;
@@ -229,18 +247,21 @@ body.mobile-mode {
   cursor: pointer;
   user-select: none;
   color: #333;
-} */
+}
 
 .card-details .card-details-header .card-bring-to-front:hover,
 .card-details .card-details-header .card-send-to-back:hover {
   color: #000;
-  background: rgba(0,0,0,0.05);
+  background: rgba(0, 0, 0, 0.05);
   border-radius: 3px;
-}
+} */
 
 .card-details .card-details-header .card-drag-handle {
-  cursor: move;
+  cursor: grab;
   user-select: none;
+  &:active {
+    cursor: grabbing;
+  }
 }
 
 .card-details .js-card-details-title {
@@ -248,13 +269,16 @@ body.mobile-mode {
   and just what's needed to edit card title */
   width: 100%;
   display: flex;
+
   .js-edit-card-title {
     height: fit-content;
     margin: 0;
   }
+
   .edit-controls {
     flex: 1;
     align-items: center;
+
     button {
       margin: 0;
       display: flex;
@@ -263,6 +287,7 @@ body.mobile-mode {
       align-items: center;
     }
   }
+
   .js-submit-edit-card-title-form {
     margin: 0.3lh 0;
     flex: 1;
@@ -279,11 +304,13 @@ body.mobile-mode {
   line-height: 1.2;
   transition: color 0.13s;
 }
+
 .card-details .card-details-header .close-card-details-mobile-web,
 .card-details .card-details-header .card-mobile-desktop-toggle {
   cursor: pointer;
   user-select: none;
 }
+
 .card-details .card-details-header .card-mobile-desktop-toggle {
   cursor: pointer;
   user-select: none;
@@ -293,17 +320,11 @@ body.mobile-mode {
 body:not(.mobile-mode) {
 
   .card-details-date-container,
-  .card-details-user-container,
   .card-details-misc-container,
   card-details-description {
     grid-template-columns: repeat(3, 1fr) !important;
     gap: 1ch;
   }
-}
-
-/* Unify all card text to match title size */
-.card-details {
-  font-size: 1em;
 }
 
 .card-details .card-details-header .card-details-watch {
@@ -317,61 +338,98 @@ body:not(.mobile-mode) {
     font-size: 1.33em;
     margin: 0;
     --overflow-lines: 3;
+
     & p {
       margin: 0;
     }
   }
 }
 
+/* #FIXME too dirty */
+.card-details-left,
+.card-details-main,
+.card-checklist-attachmentGalleries {
+  >*>a:not(.add-attachment, .member, .avatar-initials, .rounded-fa-button, .fa),
+  >*>select {
+    background: #f7f7f7;
+    display: flex;
+    justify-content: center;
+  }
+}
 
-.card-add-label, .card-details .js-date-format-selector {
+.card-add-label,
+.card-details .js-date-format-selector {
   padding: 0.2lh 0.5ch;
+}
+
+.card-details-item {
+  background: #f5f5f5;
+  padding-block: var(--space-3xs);
+  padding-inline: var(--space-xs);
+  border-radius: var(--step--3);
 }
 .card-details-main {
   display: flex;
-  gap: 0.3lh;
   flex-direction: column;
+
   hr {
     margin: 0;
   }
+
   &>div {
     display: flex;
     gap: 0.2lh;
     flex: 1;
   }
+
   &>div:empty {
     /* to avoid gaps */
     display: none;
   }
+
   .card-details-misc-container {
     display: flex;
     flex-direction: column;
     gap: 0.3lh;
   }
-  .card-details-date-container, .card-details-user-container {
+
+  .card-details-user-container {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr) !important;
+    gap: 0.3lh;
+
+    .card-details-item {
+      display: grid;
+      grid-template-rows: 1fr auto;
+      align-items: center;
+      justify-content: space-between;
+    }
+  }
+
+  .card-details-date-container {
     display: grid;
     grid-template-columns: 1fr 1fr;
     gap: 1ch;
     align-items: end;
     h3 {
-      + *:not(:has(.member), :is(:hover)) {
+      +*:not(:has(.member), :is(:hover)) {
         background-color: #f7f7f7;
       }
-      + *:not(:is(form)) {
+
+      +*:not(:is(form)) {
         display: flex;
         align-items: center;
         overflow: hidden;
-        font-size: 0.8em;
+        font-size: var(--step--1);
 
         &:not(.member, :has(.member)) {
           border-radius: 5px;
-          justify-content: start;
-          height: 1.8lh;
-          padding: 0.3lh 1ch;
+          justify-self: stretch;
+          justify-content: center;
         }
 
-        &:has(select) {
           padding-inline: 0 !important;
+          place-content: stretch;
           >select {
             align-self: stretch;
           }
@@ -380,6 +438,7 @@ body:not(.mobile-mode) {
         time {
           color: black;
         }
+
         +form {
           height: 3lh;
           overflow: visible;
@@ -392,9 +451,11 @@ body:not(.mobile-mode) {
       }
     }
   }
+
   .card-details-items {
     gap: 0.5lh;
   }
+
   .card-details-comments {
     flex-direction: column;
     gap: 0.5lh;
@@ -406,13 +467,16 @@ body:not(.mobile-mode) {
   flex-direction: column;
   flex: 1;
 }
+
 .card-details-comments {
   flex-direction: column;
   gap: 0.5lh;
 }
+
 .card-details .card-details-header .card-details-watch {
   color: #a6a6a6;
 }
+
 .card-details .card-details-header .card-details-title {
   font-weight: bold;
   font-size: 1.35em;
@@ -424,9 +488,32 @@ body:not(.mobile-mode) {
 }
 
 body.mobile-mode {
+  form {
+    >* {
+      padding-inline: 0.5ch;
+    }
+  }
+
   .card-details .card-details-header .card-details-title {
     --overflow-lines: 2;
     font-size: 0.8em;
+  }
+
+  .card-details-item-title,
+  .contextual-text {
+    padding-inline: 1ch;
+  }
+
+  .card-attachmentGallery {
+    display: flex;
+    justify-content: center;
+  }
+
+  .add-attachment {
+    border-radius: 50%;
+    background: #f7f7f7;
+    border: unset;
+    justify-content: center;
   }
 }
 
@@ -435,32 +522,56 @@ body.mobile-mode {
   font-size: 1em;
   margin-bottom: 0;
 }
+
 .card-details .card-details-header .linked-card-location p {
   margin-bottom: 0;
 }
+
 .card-details .card-description i.fa.fa-pencil-square-o {
   float: right;
 }
+
 .card-details .card-description textarea {
   resize: vertical;
   min-height: 2lh;
 }
+
 .card-details {
-  .card-details-items, .card-details-item {
-    display: flex;
-    flex-direction: column;
-    gap: 0.3lh;
+
+  .card-details-items {
+    display: grid;
+    grid-auto-flow: column;
+    grid-auto-columns: 1fr;
   }
   .card-details-item {
-    justify-content: end;
-    align-self: stretch;
+    display: grid;
+    /* so every row is same height across items */
+    grid-template-rows: subgrid;
+    grid-row: auto/span 2;
   }
+
+  .card-details-date-container .card-details-item {
+    align-self: stretch;
+    place-items: center;
+    place-content: stretch;
+    &:has(select) {
+      place-items: stretch;
+    }
+    >h3 {
+      justify-self: center;
+    }
+    .card-details-item-content {
+      align-self: stretch;
+    }
+  }
+
   .card-details-avatar-container {
     display: flex;
     justify-content: start;
     gap: 0.5ch;
   }
 }
+
 .card-details-item-labels-container {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(12ch, auto));
@@ -476,298 +587,373 @@ body.mobile-mode {
   flex-wrap: nowrap;
   align-items: center;
   gap: 1ch;
+
   h2 {
     margin: 0;
   }
+
   .subtask {
     min-height: 1.5lh;
   }
 }
+
 .card-details .card-details-item-title {
   font-weight: bold;
   color: #4d4d4d;
   display: flex;
   align-items: center;
   gap: 0.8ch;
+  padding-block: var(--vspace-s) var(--vspace-m);
 }
 
 .card-details .edit-card-details-description {
   display: flex;
   align-items: center;
   gap: .5ch;
+
+  &>a {
+    flex: 1;
+    display: flex;
+    justify-content: center;
+  }
 }
+
 .card-details .activities {
   padding-top: 10px;
+}
+
+.card-members-filter {
+  margin-inline: 1ch;
 }
 
 body.mobile-mode .card-details .card-details-canvas {
   padding: 0 !important;
 }
+
 .card-details-white {
   background: #fff !important;
   color: #000 !important;
   border: 1px solid #eee;
 }
+
 .card-details-green {
   background: #3cb500 !important;
   color: #fff !important;
 }
+
 .card-details-yellow {
   background: #fad900 !important;
   color: #000 !important;
 }
+
 .card-details-orange {
   background: #ff9f19 !important;
   color: #000 !important;
 }
+
 .card-details-red {
   background: #eb4646 !important;
   color: #fff !important;
 }
+
 .card-details-purple {
   background: #a632db !important;
   color: #fff !important;
 }
+
 .card-details-blue {
   background: #0079bf !important;
   color: #fff !important;
 }
+
 .card-details-pink {
   background: #ff78cb !important;
   color: #000 !important;
 }
+
 .card-details-sky {
   background: #00c2e0 !important;
   color: #fff !important;
 }
+
 .card-details-black {
   background: #4d4d4d !important;
   color: #fff !important;
 }
+
 .card-details-lime {
   background: #51e898 !important;
   color: #000 !important;
 }
+
 .card-details-silver {
   background: #c0c0c0 !important;
   color: #000 !important;
 }
+
 .card-details-peachpuff {
   background: #ffdab9 !important;
   color: #000 !important;
 }
+
 .card-details-crimson {
   background: #dc143c !important;
   color: #fff !important;
 }
+
 .card-details-plum {
   background: #dda0dd !important;
   color: #000 !important;
 }
+
 .card-details-darkgreen {
   background: #006400 !important;
   color: #fff !important;
 }
+
 .card-details-slateblue {
   background: #6a5acd !important;
   color: #fff !important;
 }
+
 .card-details-magenta {
   background: #f0f !important;
   color: #fff !important;
 }
+
 .card-details-gold {
   background: #ffd700 !important;
   color: #000 !important;
 }
+
 .card-details-navy {
   background: #000080 !important;
   color: #fff !important;
 }
+
 .card-details-gray {
   background: #808080 !important;
   color: #fff !important;
 }
+
 .card-details-saddlebrown {
   background: #8b4513 !important;
   color: #fff !important;
 }
+
 .card-details-paleturquoise {
   background: #afeeee !important;
   color: #000 !important;
 }
+
 .card-details-mistyrose {
   background: #ffe4e1 !important;
   color: #000 !important;
 }
+
 .card-details-indigo {
   background: #4b0082 !important;
   color: #fff !important;
 }
+
 .voted {
   opacity: 0.7;
 }
+
 .vote-title {
   display: flex;
   justify-content: space-between;
-  & + .viewer {
+
+  &+.viewer {
     font-size: 1.1em;
     font-weight: bold;
   }
+
   align-items: center;
 }
+
 .vote-title .js-edit-date {
   align-self: flex-start;
 }
+
 .vote-result {
   display: flex;
   gap: 0.5ch;
+
   .card-label {
     min-width: 5ch;
   }
-.js-show-positive-votes {
-  cursor: pointer;
-}
-.poker-voted {
-  opacity: 0.7;
-}
-.poker-title {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-.poker-title .js-edit-date {
-  align-self: flex-start;
-}
-.poker-result {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 7px;
-}
-.js-show-positive-poker-votes {
-  cursor: pointer;
-}
-.poker-deck {
-  display: grid;
-  grid-auto-flow: row;
-  text-align: center;
-  gap: 6px;
-}
-.poker-card-result {
-  width: 34px;
-  font-size: 1em;
-  font-weight: bold;
-  padding: 4px 2px;
-  cursor: default;
-  border-radius: 3px;
-}
-.winner {
-  font-weight: bold;
-  outline: #2d2d2d solid 2px;
-}
-.loser {
-  opacity: 0.5;
-}
-.responsive-table {
-  overflow-x: auto;
-  width: 100%;
-}
-.poker-table {
-  display: table;
-  width: 100%;
-  padding-top: 10px;
-}
-.poker-table-row {
-  display: table-row;
-}
-.poker-table-heading {
-  background-color: #eee;
-  display: table-header-group;
-}
-.poker-table-cell {
-  display: table-cell;
-  padding: 0 0 5px 2px;
-  border-bottom: 1px solid #d2d0d0;
-  text-align: center;
-  min-width: 45px;
-}
-.poker-table-cell-who {
-  width: 150px;
-  vertical-align: middle;
-}
-.poker-table-heading-left,
-.poker-table-heading-right {
-  display: table-header-group;
-  font-weight: bold;
-  border-top: 1px solid #808080;
-}
-@media (max-width: 400px) {
-  .poker-table-heading-right {
-    display: none;
-  }
-}
-.poker-table-body {
-  display: table-row-group;
-}
-.poker-table-side-left,
-.poker-table-side-right {
-  display: inline-block;
-}
-.poker-table-side-right {
-  padding-left: 10px;
-}
-@media (max-width: 400px) {
-  .poker-table-side-right {
-    padding-left: 0px;
-  }
-}
-.estimation-add {
-  display: block;
-  overflow: auto;
-}
-.estimation-add button {
-  display: inline-block;
-}
-.poker-card {
-  width: 48px;
-  height: 72px;
-  float: left;
-  background: #fff;
-  border-radius: 5px;
-  display: table;
-  box-sizing: border-box;
-  padding: 5px;
-  margin: 3px;
-  font-weight: bold;
-  text-shadow: #2d2d2d 1px 1px 0;
-  box-shadow: 0 0 5px #aaa;
-  text-align: center;
-  position: relative;
-  cursor: pointer;
-  transition: box-shadow 0.12s;
-}
-.poker-card .inner {
-  display: table-cell;
-  vertical-align: middle;
-  border-radius: 5px;
-  overflow: hidden;
-  background-color: #cecece;
-}
 
-/* Drag and drop file upload visual feedback */
-.js-card-details.is-dragging-over {
-  border: 2px dashed #0079bf;
-  background-color: #e3f2fd !important;
-  transform: scale(1.01);
-  transition: all 0.2s ease;
-}
+  .js-show-positive-votes {
+    cursor: pointer;
+  }
 
-.cardMorePopup {
-  display: flex;
-  flex-direction: column;
-  gap: 0.1lh;
-  .card-add-date {
+  .poker-voted {
+    opacity: 0.7;
+  }
+
+  .poker-title {
     display: flex;
-    gap: 0.5ch;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .poker-title .js-edit-date {
+    align-self: flex-start;
+  }
+
+  .poker-result {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 7px;
+  }
+
+  .js-show-positive-poker-votes {
+    cursor: pointer;
+  }
+
+  .poker-deck {
+    display: grid;
+    grid-auto-flow: row;
+    text-align: center;
+    gap: 6px;
+  }
+
+  .poker-card-result {
+    width: 34px;
+    font-size: 1em;
+    font-weight: bold;
+    padding: 4px 2px;
+    cursor: default;
+    border-radius: 3px;
+  }
+
+  .winner {
+    font-weight: bold;
+    outline: #2d2d2d solid 2px;
+  }
+
+  .loser {
+    opacity: 0.5;
+  }
+
+  .responsive-table {
+    overflow-x: auto;
+    width: 100%;
+  }
+
+  .poker-table {
+    display: table;
+    width: 100%;
+    padding-top: 10px;
+  }
+
+  .poker-table-row {
+    display: table-row;
+  }
+
+  .poker-table-heading {
+    background-color: #eee;
+    display: table-header-group;
+  }
+
+  .poker-table-cell {
+    display: table-cell;
+    padding: 0 0 5px 2px;
+    border-bottom: 1px solid #d2d0d0;
+    text-align: center;
+    min-width: 45px;
+  }
+
+  .poker-table-cell-who {
+    width: 150px;
+    vertical-align: middle;
+  }
+
+  .poker-table-heading-left,
+  .poker-table-heading-right {
+    display: table-header-group;
+    font-weight: bold;
+    border-top: 1px solid #808080;
+  }
+
+  @media (max-width: 400px) {
+    .poker-table-heading-right {
+      display: none;
+    }
+  }
+
+  .poker-table-body {
+    display: table-row-group;
+  }
+
+  .poker-table-side-left,
+  .poker-table-side-right {
+    display: inline-block;
+  }
+
+  .poker-table-side-right {
+    padding-left: 10px;
+  }
+
+  @media (max-width: 400px) {
+    .poker-table-side-right {
+      padding-left: 0px;
+    }
+  }
+
+  .estimation-add {
+    display: block;
+    overflow: auto;
+  }
+
+  .estimation-add button {
+    display: inline-block;
+  }
+
+  .poker-card {
+    width: 48px;
+    height: 72px;
+    float: left;
+    background: #fff;
+    border-radius: 5px;
+    display: table;
+    box-sizing: border-box;
+    padding: 5px;
+    margin: 3px;
+    font-weight: bold;
+    text-shadow: #2d2d2d 1px 1px 0;
+    box-shadow: 0 0 5px #aaa;
+    text-align: center;
+    position: relative;
+    cursor: pointer;
+    transition: box-shadow 0.12s;
+  }
+
+  .poker-card .inner {
+    display: table-cell;
+    vertical-align: middle;
+    border-radius: 5px;
+    overflow: hidden;
+    background-color: #cecece;
+  }
+
+  /* Drag and drop file upload visual feedback */
+  .js-card-details.is-dragging-over {
+    border: 2px dashed #0079bf;
+    background-color: #e3f2fd !important;
+    transform: scale(1.01);
+    transition: all 0.2s ease;
+  }
+
+  .cardMorePopup {
+    display: flex;
+    flex-direction: column;
+    gap: 0.1lh;
+
+    .card-add-date {
+      display: flex;
+      gap: 0.5ch;
+    }
   }
 }

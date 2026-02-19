@@ -137,20 +137,12 @@ FlowRouter.route('/b/:boardId/:slug/:cardId', {
   name: 'card',
   action(params) {
     Session.set('currentBoard', params.boardId);
-    Session.set('currentCard', params.cardId);
     Session.set('popupCardId', null);
     Session.set('popupCardBoardId', null);
 
-    // In desktop mode, add to openCards array to support multiple cards
-    const isMobile = Utils.getMobileMode();
-    if (!isMobile) {
-      const openCards = Session.get('openCards') || [];
-      if (!openCards.includes(params.cardId)) {
-        openCards.push(params.cardId);
-        Session.set('openCards', openCards);
-      }
-    }
-
+    // ⚠️ do not void 'currentCard' before calling this function,
+    // or it will never be able to decide whether it is a change/addition/removal
+    Utils.manageCurrentCard(params.cardId);
     Utils.manageCustomUI();
     Utils.manageMatomo();
 

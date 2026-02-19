@@ -2,6 +2,7 @@
 // You should always use `createEscapeableTextComplete` or the jQuery extension
 // `escapeableTextComplete` instead of the vanilla textcomplete.
 import { Textcomplete } from '@textcomplete/core';
+import { Editor } from '@textcomplete/core';
 import { TextareaEditor } from '@textcomplete/textarea';
 import { ContenteditableEditor } from '@textcomplete/contenteditable';
 
@@ -14,12 +15,35 @@ let dropdownMenuIsOpened = false;
  * @param {Object} options - Additional options
  * @returns {Textcomplete} The textcomplete instance
  */
-export function createEscapeableTextComplete(element, strategies, options = {}) {
+export function createEscapeableTextComplete(element, strategies, options = {}, largerDOMListener = null) {
   // Determine the appropriate editor based on element type
   const isContentEditable = element.isContentEditable || element.contentEditable === 'true';
-  const Editor = isContentEditable ? ContenteditableEditor : TextareaEditor;
-
-  const editor = new Editor(element);
+  const EditorClass = isContentEditable ? ContenteditableEditor : TextareaEditor;
+  // Monkeypatch this library so tab is not interpreted as "Enter"
+  const editor = new EditorClass(element);
+  editor.getCode = (e) => {
+    switch (e.keyCode) {
+      case 13: // enter
+        return "ENTER";
+      case 27: // esc
+        return "ESC";
+      case 38: // up
+        return "UP";
+      // instead interpret as down
+      case 9: //tab
+      case 40: // down
+        return "DOWN";
+      case 78: // ctrl-n
+        if (e.ctrlKey)
+          return "DOWN";
+        break;
+      case 80: // ctrl-p
+        if (e.ctrlKey)
+          return "UP";
+        break;
+    }
+    return "OTHER";
+  }
 
   // Merge default options
   const mergedOptions = {
@@ -37,9 +61,18 @@ export function createEscapeableTextComplete(element, strategies, options = {}) 
   // or `Enter` to validate the auto-completion. We also need to stop the
   // event propagation to prevent EscapeActions side effect, for instance the
   // minicard submission (on `Enter`) or going on the next column (on `Tab`).
-  element.addEventListener('keydown', (evt) => {
+  (largerDOMListener ?? element).addEventListener('keydown', (evt) => {
     if (dropdownMenuIsOpened && (evt.keyCode === 9 || evt.keyCode === 13)) {
-      evt.stopPropagation();
+      if (evt.keyCode === 9) {
+        const curr = $('.textcomplete-item.active');
+        let mod = curr.next('.textcomplete-item');
+        if (!mod.length) {
+          mod = curr.siblings('.textcomplete-item').first();
+          curr.removeClass('active')
+          mod.addClass('active');
+        }
+        evt.stopPropagation();
+      }
     }
   });
 
@@ -71,9 +104,9 @@ export function createEscapeableTextComplete(element, strategies, options = {}) 
 }
 
 // jQuery extension for backward compatibility
-$.fn.escapeableTextComplete = function(strategies, options = {}) {
+$.fn.escapeableTextComplete = function(strategies, options = {}, largerDOMListener = null) {
   return this.each(function() {
-    createEscapeableTextComplete(this, strategies, options);
+    createEscapeableTextComplete(this, strategies, options, largerDOMListener);
   });
 };
 

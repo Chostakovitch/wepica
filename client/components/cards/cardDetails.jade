@@ -7,8 +7,8 @@ template(name="cardDetailsPopup")
 
 template(name="cardDetails")
   +attachmentViewer
-  section.card-details.js-card-details.nodragscroll(class='{{#if isPopup}}card-details-popup{{/if}}' class='{{#unless isVerticalScrollbars}}no-scrollbars{{/unless}}' class='{{#if cardCollapsed}}collapsed{{/if}}'): .card-details-canvas
-    .card-details-header(class='{{#if colorClass}}card-details-{{colorClass}}{{/if}}')
+  section.card-details.pad.js-card-details.nodragscroll(class='{{#if isPopup}}card-details-popup{{/if}}' class='{{#unless isVerticalScrollbars}}no-scrollbars{{/unless}}' class='{{#if cardCollapsed}}collapsed{{/if}}'): .card-details-canvas
+    .card-details-header.header(class='{{#if colorClass}}card-details-{{colorClass}}{{/if}}')
       +inlinedForm(classNames="js-card-details-title")
         +editCardTitleForm
       else
@@ -105,14 +105,15 @@ template(name="cardDetails")
                   | {{_ 'labels'}}
                   if canModifyCard
                     unless currentUser.isWorker
-                      a.card-add-label.js-add-labels(title="{{_ 'card-labels-title'}}")
+                      a(class="{{#if canModifyCard}}js-add-labels{{else}}is-disabled{{/if}}" title="{{_ 'card-labels-title'}}")
                         i.fa.fa-plus
-                a.card-details-item-labels-container(class="{{#if canModifyCard}}js-add-labels{{else}}is-disabled{{/if}}" title="{{_ 'card-labels-title'}}")
+                .card-details-item-labels-container
                   each labels
                     span.card-label(class="card-label-{{color}}" title=name)
                       +viewer
                         = name
-            hr
+          hr
+          .card-details-items
             .card-details-date-container
               if currentBoard.allowsReceivedDate
                 .card-details-item.card-details-item-received
@@ -199,7 +200,7 @@ template(name="cardDetails")
                       | {{! XXX Hack to hide syntaxic coloration /// }}
                     if canModifyCard
                       unless currentUser.isWorker
-                        a.member.add-member.card-details-item-add-button.js-add-members(title="{{_ 'card-members-title'}}")
+                        a.member.add-member.js-add-members(title="{{_ 'card-members-title'}}")
                           i.fa.fa-plus
 
               //if assigneeSelected
@@ -213,11 +214,11 @@ template(name="cardDetails")
                       +userAvatar(userId=userId cardId=_id assignee=true)
                       | {{! XXX Hack to hide syntaxic coloration /// }}
                     if canModifyCard
-                      a.member.add-assignee.card-details-item-add-button.js-add-assignees(title="{{_ 'assignee'}}")
+                      a.member.add-assignee.js-add-assignees(title="{{_ 'assignee'}}")
                         i.fa.fa-plus
                     if currentUser.isWorker
                       unless assigneeSelected
-                        a.member.add-assignee.card-details-item-add-button.js-add-assignees(title="{{_ 'assignee'}}")
+                        a.member.add-assignee.js-add-assignees(title="{{_ 'assignee'}}")
                           i.fa.fa-plus
 
               //.card-details-items
@@ -263,28 +264,28 @@ template(name="cardDetails")
 
           if $or currentBoard.allowsCardSortingByNumber getSpentTime
             hr
+          .card-details-items
+            if currentBoard.allowsCardSortingByNumber
+              .card-details-item.card-details-sort-order
+                h3.card-details-item-title
+                  i.fa.fa-sort-numeric-asc
+                  | {{_ 'sort'}}
+                if canModifyCard
+                  +inlinedForm(classNames="js-card-details-sort horizontal")
+                    +editCardSortOrderForm
+                  else
+                    a.js-open-inlined-form
+                      +viewer
+                        = sort
 
-          if currentBoard.allowsCardSortingByNumber
-            .card-details-item.card-details-sort-order
-              h3.card-details-item-title
-                i.fa.fa-sort-numeric-asc
-                | {{_ 'sort'}}
-              if canModifyCard
-                +inlinedForm(classNames="js-card-details-sort")
-                  +editCardSortOrderForm
-                else
-                  a.js-open-inlined-form
-                    +viewer
-                      = sort
-
-          if currentBoard.allowsShowLists
-            .card-details-item.card-details-show-lists
-              h3.card-details-item-title
-                i.fa.fa-list
-                | {{_ 'list'}}
-              select.js-select-card-details-lists(disabled="{{#unless canModifyCard}}disabled{{/unless}}")
-                each currentBoard.lists
-                  option(value="{{_id}}" selected="{{#if isCurrentListId _id}}selected{{/if}}") {{title}}
+            if currentBoard.allowsShowLists
+              .card-details-item.card-details-show-lists
+                h3.card-details-item-title
+                  i.fa.fa-list
+                  | {{_ 'list'}}
+                select.js-select-card-details-lists(disabled="{{#unless canModifyCard}}disabled{{/unless}}")
+                  each currentBoard.lists
+                    option(value="{{_id}}" selected="{{#if isCurrentListId _id}}selected{{/if}}") {{title}}
 
           //.card-details-items
           if getSpentTime
@@ -543,49 +544,52 @@ template(name="cardDetails")
               div.estimation-add
                 button.card-details-red.js-poker-replay(class="{{#if $eq voteState false}}voted{{/if}}") {{_ 'poker-replay'}}
               div.estimation-add
-                button.js-poker-estimation
+                button.rounded-fa-button.js-poker-estimation
                   i.fa.fa-plus
                   | {{_ 'set-estimation'}}
                 input(type=text,autofocus value=getPokerEstimation,id="pokerEstimation")
 
-        //- XXX We should use "editable" to avoid repetiting ourselves
-        if canModifyCard
-          unless currentUser.isWorker
-            if currentBoard.allowsDescriptionTitle
-              hr
-              h3.card-details-item-title
-                i.fa.fa-file-text-o
-                | {{_ 'description'}}
-            if currentBoard.allowsDescriptionText
-              +inlinedCardDescription(classNames="card-description js-card-description")
-                +descriptionForm
-                .edit-controls.clearfix
-                  button.primary(type="submit") {{_ 'save'}}
-                  a.js-close-inlined-form
-              else
-                if currentBoard.allowsDescriptionText
-                  .edit-card-details-description
-                    a.js-open-inlined-form(title="{{_ 'edit'}}" value=title)
-                      i.fa.fa-pencil-square-o
-                    a.js-open-inlined-form(title="{{_ 'edit'}}" value=title)
-                      if getDescription
-                        +viewer
-                          = getDescription
-                    if (hasUnsavedValue 'cardDescription' _id)
-                      p.quiet
-                        | {{_ 'unsaved-description'}}
-                        a.js-open-inlined-form {{_ 'view-it'}}
-                        = ' - '
-                        a.js-close-inlined-form {{_ 'discard'}}
-        else if getDescription
-          if currentBoard.allowsDescriptionTitle
-            hr
-            h3.card-details-item-title {{_ 'description'}}
-          if currentBoard.allowsDescriptionText
-            +viewer
-              = getDescription
 
-        .card-checklist-attachmentGalleries
+
+        hr
+        .card-detail-items
+          .card-description
+            //- XXX We should use "editable" to avoid repetiting ourselves
+            if canModifyCard
+              unless currentUser.isWorker
+                if currentBoard.allowsDescriptionTitle
+                  h3.card-details-item-title
+                    i.fa.fa-file-text-o
+                    | {{_ 'description'}}
+                if currentBoard.allowsDescriptionText
+                  +inlinedCardDescription(classNames="card-description js-card-description horizontal")
+                    +descriptionForm
+                    .edit-controls.clearfix
+                      button.primary(type="submit") {{_ 'save'}}
+                      button.negate.js-close-inlined-form
+                        i.fa.fa-times-thin
+                  else
+                    if currentBoard.allowsDescriptionText
+                      .edit-card-details-description.card-details-item
+                        a.js-open-inlined-form(title="{{_ 'edit'}}" value=title)
+                          i.fa.fa-pencil-square-o
+                          if getDescription
+                            +viewer
+                              = getDescription
+                        if (hasUnsavedValue 'cardDescription' _id)
+                          p.quiet
+                            | {{_ 'unsaved-description'}}
+                            a.js-open-inlined-form {{_ 'view-it'}}
+                            = ' - '
+                            a.js-close-inlined-form {{_ 'discard'}}
+            else if getDescription
+              if currentBoard.allowsDescriptionTitle
+                h3.card-details-item-title {{_ 'description'}}
+              if currentBoard.allowsDescriptionText
+                +viewer
+                  = getDescription
+
+        .card-checklist-attachmentGalleries.card-details-items
           .card-checklist-attachmentGallery.card-checklists
             if currentBoard.allowsChecklists
               hr
@@ -594,19 +598,21 @@ template(name="cardDetails")
               hr
               +subtasks(cardId = _id)
           if currentBoard.allowsAttachments
-            hr
-            h3.card-details-item-title
-              i.fa.fa-paperclip
-              | {{_ 'attachments'}}
-            if Meteor.settings.public.attachmentsUploadMaxSize
-              | {{_ 'max-upload-filesize'}} {{Meteor.settings.public.attachmentsUploadMaxSize}}
-              br
-            if Meteor.settings.public.attachmentsUploadMimeTypes
-              | {{_ 'allowed-upload-filetypes'}} {{Meteor.settings.public.attachmentsUploadMimeTypes}}
-              br
-            | {{_ 'invalid-file'}}
-            .card-checklist-attachmentGallery.card-attachmentGallery
-              +attachmentGallery
+            .card-details-items
+              hr
+              h3.card-details-item-title
+                i.fa.fa-paperclip
+                | {{_ 'attachments'}}
+              .contextual-text
+                if Meteor.settings.public.attachmentsUploadMaxSize
+                  | {{_ 'max-upload-filesize'}} {{Meteor.settings.public.attachmentsUploadMaxSize}}
+                  br
+                if Meteor.settings.public.attachmentsUploadMimeTypes
+                  | {{_ 'allowed-upload-filetypes'}} {{Meteor.settings.public.attachmentsUploadMimeTypes}}
+                  br
+                | {{_ 'invalid-file'}}
+              .card-checklist-attachmentGallery.card-attachmentGallery
+                +attachmentGallery
         hr
 
         unless currentUser.isNoComments
@@ -673,7 +679,7 @@ template(name="editCardSortOrderForm")
   input.js-edit-card-sort(type='text' value=sort dir="auto")
   .edit-controls.clearfix
     button.primary.confirm.js-submit-edit-card-sort-form(type="submit") {{_ 'save'}}
-    a.js-close-inlined-form
+    button.js-close-inlined-form.negate
       i.fa.fa-times-thin
 
 template(name="cardDetailsActionsPopup")
@@ -1074,7 +1080,7 @@ template(name="setCardColorPopup")
           if(isSelected color)
             i.fa.fa-check
     .form-buttons
-      button.primary.confirm.js-submit {{_ 'save'}}
+      button.primary.confirm.full.js-submit {{_ 'save'}}
       button.js-remove-color.negate.wide.right {{_ 'unset-color'}}
 
 template(name="cardDeletePopup")
@@ -1112,7 +1118,8 @@ template(name="cardStartVotingPopup")
           span
             | {{_ 'card-end'}}
             unless getVoteEnd
-              i.fa.fa-plus
+              .rounded-fa-button
+                i.fa.fa-plus
         if getVoteEnd
           +voteEndDate
 

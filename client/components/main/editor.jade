@@ -1,14 +1,14 @@
 template(name="editor")
-  .editor-controls
-    a.fa.fa-brands.fa-markdown(title="{{_ 'convert-to-markdown'}}")
-    a.fa.fa-copy(title="{{_ 'copy-text-to-clipboard'}}")
-    span.copied-tooltip.copied-tooltip-hidden {{_ 'copied'}}
   textarea.editor(
     dir="auto"
     class="{{class}}"
     id=id
     placeholder="{{_ 'comment-placeholder'}}")
     +Template.contentBlock
+  .editor-controls
+    a.fa.fa-brands.fa-markdown(title="{{_ 'convert-to-markdown'}}")
+    a.fa.fa-copy(title="{{_ 'copy-text-to-clipboard'}}")
+    span.copied-tooltip.copied-tooltip-hidden {{_ 'copied'}}
 
 template(name="viewer")
   .viewer(dir="auto")

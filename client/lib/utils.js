@@ -656,6 +656,62 @@ Utils = {
     }
   },
 
+  manageCurrentCard(cardId) {
+    // This function manages openCard and currentCard
+    // The parameter is the card id which we need to add or remove from
+    // those sessions variable; the action to do is decided given the
+    // previous values; if you want to decide yourself, set session
+    // variables outside this function.
+
+    const card = ReactiveCache.getCard(cardId);
+    const cardBoardId = card?.board?._id;
+    const currentCardId = Session.get('currentCard');
+    const currentBoardId = Session.get('currentBoard');
+    const board = ReactiveCache.getBoard(currentBoardId);
+
+    // ⚠️ initially openCards was not managed on mobile,
+    // but seems harmless if mobile ignores openCards;
+    // simpler to change later
+    let openCards = Session.get('openCards') || [];
+    let nextCurrentCard;
+    if (card && cardBoardId && currentBoardId && board) {
+      // Click on the minicard which is opened: close it
+      // 💡 .at() and .pop() handles empty array and return
+      // undefined.
+      if (openCards.includes(cardId)) {
+        openCards = openCards.filter(id => id !== cardId);
+        // stack-like: make the last one be the current one
+        cardId = openCards.pop();
+      }
+      // new card!
+      else {
+        openCards.push(cardId);
+        nextCurrentCard = cardId;
+      }
+    }
+    else {
+      // should not happen, but just in case...
+      // remove element from the stack so we avoid an
+      // unoticed stacking phenomenom
+      if (openCards.length) {
+        nextCurrentCard = openCards.pop();
+      }
+    }
+
+    Session.set('currentCard', nextCurrentCard);
+    Session.set('openCards', openCards);
+
+    // Navigate back to board if no cards left
+    if (!nextCurrentCard) {
+      if (board) {
+        FlowRouter.go('board', {
+          id: board._id,
+          slug: board.slug,
+        });
+      }
+    }
+  },
+
   getTriggerActionDesc(event, tempInstance) {
     const jqueryEl = tempInstance.$(event.currentTarget.parentNode);
     const triggerEls = jqueryEl.find('.trigger-content').children();
