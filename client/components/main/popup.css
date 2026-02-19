@@ -301,7 +301,7 @@ body.mobile-mode .pop-over .content>form {
   &[data-popup="changeSettingsPopup"] {
     --t-columns: 30ch 15ch;
     li {
-      place-items: center;
+      align-items: center;
       max-width: 15ch;
     }
   }
@@ -322,6 +322,18 @@ body.mobile-mode .pop-over .content>form {
       button {
         flex: 0;
       }
+    }
+  }
+
+  &[data-popup="changeAvatarPopup"] {
+    .pop-over-list li {
+      padding-block: var(--vspace-m);
+    }
+  }
+
+  &[data-popup="cardDetails"] {
+    .card-details, .card-details-canvas {
+      padding: 0 !important;
     }
   }
 }
