@@ -161,12 +161,6 @@ body.mobile-mode {
       gap: 0.3lh;
     }
   }
-  .viewer p {
-    /* cf https://developer.mozilla.org/fr/docs/Web/CSS/Reference/Properties/text-overflow  */
-    white-space: nowrap;
-    overflow: scroll;
-    text-overflow: ellipsis;
-  }
 }
 .open-list-composer {
   justify-content: start;

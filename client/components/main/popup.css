@@ -63,7 +63,6 @@ sizing make them too large. maybe this can be relaxed per-popup */
   padding-inline: var(--space-xs);
   padding-block: var(--vspace-s);
   border-bottom: 1px solid #dcdcdc;
-  color: #666;
   min-height: 1.5lh;
 }
 .pop-over .header .header-title {
@@ -104,9 +103,11 @@ sizing make them too large. maybe this can be relaxed per-popup */
 
   /* try to catch all small settings/info popups  */
   & > form, .at-form {
-    gap: var(--vspace-2xs);
-    button.submit {
-      margin-block: var(--vspace-l);
+    &:not(:has(.full)) {
+      gap: var(--vspace-2xs);
+      button.submit {
+        margin-block: var(--vspace-l);
+      }
     }
   }
 }
@@ -189,6 +190,12 @@ body.mobile-mode  {
 .pop-over .sk-spinner {
   margin: 40px auto;
 }
+.pop-over-list {
+  input, select {
+    /* only easy way to set full width, safe because inside a grid */
+    width: 100%;
+  }
+}
 .pop-over-list li {
   display: block;
   clear: both;
@@ -204,10 +211,6 @@ body.mobile-mode  {
   display:flex;
   align-items: center;
   color: #000 !important;
-}
-.pop-over-list li > a > .member{
-  align-self: flex-start;
-  flex:0 0 auto;
 }
 .pop-over-list li > a .item-name {
   display: block;

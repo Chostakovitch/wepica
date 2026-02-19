@@ -265,6 +265,7 @@ textarea::-moz-placeholder {
   display: flex;
   align-items: center;
   justify-content: center;
+  gap: var(--space-3xs);
   button {
     display: flex;
     justify-content: center;
@@ -346,6 +347,13 @@ textarea::-moz-placeholder {
   transform-origin: 0.5lh 0;
 }
 
+/* not a good practice to select .js stuff, but too many to change right now*/
+.js-open-inlined-form {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3xs);
+  padding-block: var(--vspace-s);
+}
 form .form-buttons {
   display: flex;
   flex: 1;
@@ -554,7 +562,7 @@ button.loud-text-button:hover {
   border-radius: 3px;
    -webkit-user-select: none;
   user-select: none;
-    color: #222;
+  color: #222;
   display: flex;
   position: relative;
   justify-content: center;
