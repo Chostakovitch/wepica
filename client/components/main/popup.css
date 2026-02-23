@@ -63,7 +63,6 @@ sizing make them too large. maybe this can be relaxed per-popup */
   padding-inline: var(--space-xs);
   padding-block: var(--vspace-s);
   border-bottom: 1px solid #dcdcdc;
-  color: #666;
   min-height: 1.5lh;
 }
 .pop-over .header .header-title {
@@ -104,9 +103,11 @@ sizing make them too large. maybe this can be relaxed per-popup */
 
   /* try to catch all small settings/info popups  */
   & > form, .at-form {
-    gap: var(--vspace-2xs);
-    button.submit {
-      margin-block: var(--vspace-l);
+    &:not(:has(.full)) {
+      gap: var(--vspace-2xs);
+      button.submit {
+        margin-block: var(--vspace-l);
+      }
     }
   }
 }
@@ -153,17 +154,18 @@ body.mobile-mode  {
   margin-left: 0;
   padding-left: 0;
   display: grid;
-  grid-auto-flow: dense;
-  grid-template-columns: repeat(auto-fill, 4.5ch);
-  grid-auto-rows: 4.5ch;
-  justify-content: stretch;
-  justify-items: stretch;
+  grid-template-columns: repeat(5, var(--space-xl));
+  grid-auto-rows: var(--space-xl);
+  place-content: center;
+  place-items: stretch;
+  margin-block: var(--vspace-l);
 }
 
 /* Color palette items: ensure proper positioning */
 .pop-over .content .palette-colors .palette-color {
-  margin: 0;
-  border-radius: 0;
+  display: flex;
+  place-content: center;
+  place-items: center;
   outline: 0.1ch solid black;
 }
 .pop-over.search-over {
@@ -188,6 +190,12 @@ body.mobile-mode  {
 .pop-over .sk-spinner {
   margin: 40px auto;
 }
+.pop-over-list {
+  input, select {
+    /* only easy way to set full width, safe because inside a grid */
+    width: 100%;
+  }
+}
 .pop-over-list li {
   display: block;
   clear: both;
@@ -203,10 +211,6 @@ body.mobile-mode  {
   display:flex;
   align-items: center;
   color: #000 !important;
-}
-.pop-over-list li > a > .member{
-  align-self: flex-start;
-  flex:0 0 auto;
 }
 .pop-over-list li > a .item-name {
   display: block;
@@ -297,7 +301,7 @@ body.mobile-mode .pop-over .content>form {
   &[data-popup="changeSettingsPopup"] {
     --t-columns: 30ch 15ch;
     li {
-      place-items: center;
+      align-items: center;
       max-width: 15ch;
     }
   }
@@ -318,6 +322,18 @@ body.mobile-mode .pop-over .content>form {
       button {
         flex: 0;
       }
+    }
+  }
+
+  &[data-popup="changeAvatarPopup"] {
+    .pop-over-list li {
+      padding-block: var(--vspace-m);
+    }
+  }
+
+  &[data-popup="cardDetails"] {
+    .card-details, .card-details-canvas {
+      padding: 0 !important;
     }
   }
 }

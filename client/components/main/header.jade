@@ -5,7 +5,7 @@ template(name="header")
     Reddit "subreddit" bar.
     The first link goes to the boards page.
   if currentUser
-    #header-quick-access(class="currentBoard.colorClass {{#if isMiniScreen}}mobile-view{{/if}}")
+    #header-quick-access(class="{{currentBoard.colorClass}} {{#if isMiniScreen}}mobile-view{{/if}}")
       // Home icon - always at left side of logo
       #header-quick-access-left
         span.home-icon.allBoards

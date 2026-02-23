@@ -1118,7 +1118,7 @@ Boards.helpers({
   },
 
   colorClass() {
-    return `board-color-${this.color}`;
+    return `board-color board-color-${this.color}`;
   },
 
   customFields() {

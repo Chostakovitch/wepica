@@ -8,6 +8,8 @@
   display: -ms-flexbox;
   display: flex;
   height: 100%;
+  align-items: center;
+  gap: var(--space-3xs);
 }
 
 .setting-detail {

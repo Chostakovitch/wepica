@@ -45,11 +45,11 @@ window.Popup = new (class {
     };
   }
 
-  /// In case the popup was opened from a parent popup we can get back to it
-  /// with this `Popup.back()` function. You can go back several steps at once
-  /// by providing a number to this function, e.g. `Popup.back(2)`. In this case
-  /// intermediate popup won't even be rendered on the DOM. If the number of
-  /// steps back is greater than the popup stack size, the popup will be closed.
+  // renderParent can be used in very special situations where "parent
+  // popup", loosely defined as the top of the stack, must be redrawn
+  // entirely after closing n popups. This should rather indicate
+  // something abnormal in the code that a standard behaviour and
+  // will cause a flicker.
   back(n = 1, renderParent = false) {
     _.times(n, () => PopupComponent.destroy(renderParent));
   }

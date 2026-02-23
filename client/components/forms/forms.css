@@ -10,7 +10,7 @@ form {
 select,
 textarea,
 input:not([type=file]),
-button {
+button, .emphasis-button {
   box-sizing: border-box;
   background-color: #ebebeb;
   border: 1px solid #ccc;
@@ -265,6 +265,7 @@ textarea::-moz-placeholder {
   display: flex;
   align-items: center;
   justify-content: center;
+  gap: var(--space-3xs);
   button {
     display: flex;
     justify-content: center;
@@ -346,6 +347,13 @@ textarea::-moz-placeholder {
   transform-origin: 0.5lh 0;
 }
 
+/* not a good practice to select .js stuff, but too many to change right now*/
+.js-open-inlined-form {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3xs);
+  padding-block: var(--vspace-s);
+}
 form .form-buttons {
   display: flex;
   flex: 1;
@@ -554,39 +562,13 @@ button.loud-text-button:hover {
   border-radius: 3px;
    -webkit-user-select: none;
   user-select: none;
-    color: #222;
+  color: #222;
   display: flex;
   position: relative;
   justify-content: center;
 }
-.emphasis-button.w-img,
-.quiet-button.w-img {
-  padding-left: 28px;
-}
-.emphasis-button:hover,
-.quiet-button:hover {
-  color: #4d4d4d;
-  background: #dcdcdc;
-}
-.emphasis-button:active,
-.quiet-button:active {
-  color: #4d4d4d;
-  background: #d3d3d3;
-}
 .quiet-button-large {
   padding: 16px 24px;
-}
-.emphasis-button {
-  color: #74663e;
-  background: #ecdfbb;
-}
-.emphasis-button:hover {
-  color: #53492d;
-  background: #e7d6a7;
-}
-.emphasis-button:active {
-  color: #53492d;
-  background: #e1cc93;
 }
 .is-editable {
   cursor: pointer;

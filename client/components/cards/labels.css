@@ -1,6 +1,5 @@
 .card-label:not(.palette-color) {
   border-radius: 0.4ch;
-  color: #fff;
   display: inline-block;
   font-weight: 700;
   font-size: 0.9em;
@@ -12,10 +11,12 @@
   justify-content: center;
   align-items: center;
   text-align: center;
-  padding: 0 0.5ch;
   height: var(--label-height);
-  min-width: 8ch;
-  border: 0.1em solid black;
+  min-width: 4ch;
+  border: 0.15ch solid black;
+}
+.card-label {
+  color: black;
 }
 .card-label:hover {
   color: #fff;
@@ -38,17 +39,6 @@
 .card-label p {
   margin: 0px;
   --overflow-lines: 1;
-}
-.palette-colors {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: flex-start; /* left-align color chips in wider popovers */
-}
-.palette-colors .palette-color {
-  flex-grow: 1;
-  display: flex;
-  align-items: center;
-  justify-content: center;
 }
 .card-label-white {
   background-color: #fff;
@@ -143,21 +133,34 @@
   background-color: #4b0082;
 }
 .edit-labels-pop-over {
-  max-width: var(--popup-list-limit);
   display: grid;
-  /* so that inner elements, align nicely */
+  /* i.e. can add new rows in the middle, happen when dragging */
+  grid-auto-flow: dense;
+  grid-auto-rows: 1fr;
   grid-template-columns: 1fr;
-  gap: 0.1lh;
+  padding-block: var(--vspace-l) !important;
+  padding-inline: var(--space-xs) !important;
+  gap: var(--vspace-s);
   >li {
-    display: flex;
-    flex-direction: row-reverse;
-    gap: 1ch;
+    display: grid;
+    grid-template-rows: subgrid;
+    grid-template-columns: 1fr auto;
+    gap: var(--space-s);
     align-items: center;
   }
   .card-label-selectable {
-    flex: 1;
-    display: flex;
-    gap: 1ch;
+    display: grid;
+    grid-template-rows: subgrid;
+    grid-template-columns: repeat(auto-fit, minmax(2ch, auto));
+    gap: var(--space-s);
+    padding-inline: var(--space-xs);
+    justify-content: stretch;
+    .viewer {
+      justify-self: start;
+    }
+    .card-label-selectable-icon {
+      justify-self: end;
+    }
   }
 }
 .edit-labels-pop-over .card-label .viewer p {
