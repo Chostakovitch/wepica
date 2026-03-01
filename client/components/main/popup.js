@@ -34,6 +34,14 @@ class PopupDetachedComponent extends BlazeComponent {
     this.closeDOMs.push("click .js-close-detached-popup");
     // Also try to be smart...
     this.closeDOMs.push("click .js-close");
+
+    // Custom hook
+    this.afterCreated?.(this);
+    if (this.customAutorun) {
+      this.autorun(() => {
+        this.customAutorun(this);
+      });
+    }
   }
 
   // Main intent of this component is to have a modular popup with defaults:
@@ -61,6 +69,8 @@ class PopupDetachedComponent extends BlazeComponent {
       this.cssResized = false;
       this.draw();
     });
+
+    this.afterRendered?.(this);
   }
 
   draw() {
@@ -284,7 +294,7 @@ class PopupDetachedComponent extends BlazeComponent {
   toFront() {
     if (!this.isRendered() || !this.firstNode()) {return}
     this.currentZ(Math.max(...PopupComponent.stack.map(p => p.outerComponent.currentZ())) + 1);
-
+    this.afterToFront?.(this);
   }
 
   toBack() {
@@ -577,6 +587,14 @@ class PopupComponent extends BlazeComponent {
     return BlazeComponent.getComponentForElement($(element).closest('.pop-over')[0]);
   }
 
+  static findPopupById(popupId) {
+    return PopupComponent.stack.filter(e => e._id === popupId);
+  }
+
+  static findPopupByName(popupName) {
+    return PopupComponent.stack.filter(e => e.name === popupName);
+  }
+
   static draw(event) {
     const popup = PopupComponent.findParentPopup(event.target);
     popup?.draw();
@@ -675,16 +693,13 @@ class PopupComponent extends BlazeComponent {
     // - showHeader can be turned off if the inner content always have a header with buttons and so on
     // - title is shown when header is shown
     // - miscOptions is for compatibility
-    // - closeVar is an optional string representing a Session variable: if set, the popup reactively closes when the variable changes and set the variable to null on close
-    // - closeDOMs can be used alternatively; it is an array of "<event> <selector>" to listen that closes the popup.
+        // - closeDOMs can be used alternatively; it is an array of "<event> <selector>" to listen that closes the popup.
     //   if header is shown, closing the popup is already managed. selector is relative to the inner template (same as its event map)
     // - handleDOM is an element who can be clicked to move popup
     //   it is useful when the content can be redimensionned/moved by code or user; we still manage events, resizes etc
     //   but enables inner elements or handles to automatically make the popup move on pointer "drag".
-    // - afterConfirm is a function to call after a click on `.js-confirm`, similar to the base popup system; whatThis is an optional
-    //   object to pass as `this` when calling the function; confirmArgs is an object whose properties will be assigned to whatThis.
-    // - onDestroy is a function which will be called previous destroying with the actual inner component as `this`.
-    // - offLimits is a boolean enabling even non-sticky popups to go off the viewport limits, e.g. on handling,
+    // - afterConfirm is a function to call after a click on `.js-confirm`, similar to the base popup system; whatThis is an optional object to pass as `this` when calling the function; confirmArgs is an object whose properties will be assigned to whatThis.
+        // - offLimits is a boolean enabling even non-sticky popups to go off the viewport limits, e.g. on handling,
     //   even if it would send the popup out of viewport.this is useful for contextual popups which feels odd when far.
     //   ❓ so far I assumed a global "no" but at the end it may be a source of frustration for users with little benefit, so I added this options
     //   and set it to true. future devs can override this globally there, or locally for some popups.
@@ -696,6 +711,7 @@ class PopupComponent extends BlazeComponent {
     //   considered more "tied" to their opener than the others, and are made sticky by default.
     //   ⚠️ fixed popups are less convenient but at least stay on screen; if my code has bug, and a form was being filled,
     //   window is resized, and popup is gone (visually), users could lose draft data.
+// - onCreated, onRendered and onDestroyed can be hooked with the eponym args; they will be called at the end of the components'. ❗ this is passed as first arg, autorun is handle additionnally to onCreated
     const data = this.data();
     this.popupArgs = {
       name: data.name,
@@ -704,7 +720,11 @@ class PopupComponent extends BlazeComponent {
       openerElement: data.openerElement,
       closeDOMs: data.closeDOMs ?? [],
       handleDOM: data.handleDOM,
-      onDestroy: data.onDestroy,
+      afterCreated: data.onCreated,
+      afterRendered: data.onRendered,
+      afterDestroyed: data.onDestroyed,
+      afterToFront: data.toFront,
+      customAutorun: data.autorun,
       offLimits: data.offLimits ?? true,
       sticky: data.sticky ?? null,
       forceData: data.miscOptions?.dataContextIfCurrentDataIsUndefined || data.forceData,
@@ -856,6 +876,7 @@ class PopupComponent extends BlazeComponent {
     }
     this.innerComponent?.removeComponent?.();
     this.outerComponent?.removeComponent?.();
+    this.popupArgs?.afterDestroyed?.(this);
     this.removeComponent();
   }
 
