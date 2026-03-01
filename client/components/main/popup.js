@@ -92,6 +92,7 @@ class PopupDetachedComponent extends BlazeComponent {
         this.sticky = true;
       }
     }
+
     // In practice, this should only influence the positionning of the popup and its
     // ability to be rendered off-screen. The sizing is done regarding the unconstraigned
     // popup size within its current context, so if it depends on viewport-related units,
@@ -329,7 +330,7 @@ class PopupDetachedComponent extends BlazeComponent {
         }
       },
       // bad heuristic but only for best-effort UI
-// narrowed down to popup with headers for now
+      // narrowed down to popup with headers for now
       'pointerdown .pop-over .header'() {
         // Useful to do it now in case of dragging
         this.toFront();
@@ -341,7 +342,7 @@ class PopupDetachedComponent extends BlazeComponent {
     };
 
     const movePopup = (event) => {
-event = event.originalEvent;
+      event = event.originalEvent;
       // Ignore right-ish clicks
       if (!(event.isPrimary && (event.pointerType !== 'mouse' || event.button === 0))) {
         return;
@@ -689,22 +690,25 @@ class PopupComponent extends BlazeComponent {
   }
 
   onCreated() {
-    // do not render a template with the same name and the same related data ID multiple time (also works if no ID)
-    // this heuristic works in general cases; for future edge cases, add to the whitelist
-    const maybeID = this.parentComponent?.()?.data?.()?._id;
-    const existing = PopupComponent.stack.find((e) => (e.name === this.data().name && e.parentComponent()?.data?.()?._id === maybeID));
-    if (existing && !PopupComponent.nonUniqueWhitelist.includes(existing.name)) {
-      // 💡 here, we could change the behaviour. some possibilities are:
+    // use the data ._id or a random number to identify the popup.
+    // this heuristic works in general cases; for future edge cases, add to the whitelist.
+    const dataId = this.parentComponent?.()?.data?.()?._id;
+    this._id = dataId ?? String(Math.floor(Math.random() * 10000));
+    const isoPopup = dataId ? PopupComponent.findPopupById(dataId) : PopupComponent.findPopupByName(this.name);
+    // refuse to open multiple popup with same name and no ID or same name and same ID;
+    // default is to destroy the old one and re-render the new one, as it should
+    // better reflect stuff this programmatic moves.
+    if (isoPopup.length > 0 && !PopupComponent.nonUniqueWhitelist.includes(this.name)) {
+      // 💡 here, we could change the behaviour. possibilities are:
       // 1. destroy existing popup and let the current one open
       // 2. destroy new popup and
       //    a. do nothing
       //    b. force re-rendering of existing popup
       //    c. bring other popup to front (b. includes c.)
       // ...
-      // for now we will just bring to front
-      this.destroy();
-      existing.outerComponent.toFront();
-      return;
+      for (const popup of isoPopup) {
+        popup.destroy();
+      }
     }
 
     // All of this, except name, is optional. The rest is provided "just in case", for convenience.
@@ -715,13 +719,13 @@ class PopupComponent extends BlazeComponent {
     // - showHeader can be turned off if the inner content always have a header with buttons and so on
     // - title is shown when header is shown
     // - miscOptions is for compatibility
-        // - closeDOMs can be used alternatively; it is an array of "<event> <selector>" to listen that closes the popup.
+    // - closeDOMs can be used alternatively; it is an array of "<event> <selector>" to listen that closes the popup.
     //   if header is shown, closing the popup is already managed. selector is relative to the inner template (same as its event map)
     // - handleDOM is an element who can be clicked to move popup
     //   it is useful when the content can be redimensionned/moved by code or user; we still manage events, resizes etc
     //   but enables inner elements or handles to automatically make the popup move on pointer "drag".
     // - afterConfirm is a function to call after a click on `.js-confirm`, similar to the base popup system; whatThis is an optional object to pass as `this` when calling the function; confirmArgs is an object whose properties will be assigned to whatThis.
-        // - offLimits is a boolean enabling even non-sticky popups to go off the viewport limits, e.g. on handling,
+    // - offLimits is a boolean enabling even non-sticky popups to go off the viewport limits, e.g. on handling,
     //   even if it would send the popup out of viewport.this is useful for contextual popups which feels odd when far.
     //   ❓ so far I assumed a global "no" but at the end it may be a source of frustration for users with little benefit, so I added this options
     //   and set it to true. future devs can override this globally there, or locally for some popups.
@@ -733,9 +737,10 @@ class PopupComponent extends BlazeComponent {
     //   considered more "tied" to their opener than the others, and are made sticky by default.
     //   ⚠️ fixed popups are less convenient but at least stay on screen; if my code has bug, and a form was being filled,
     //   window is resized, and popup is gone (visually), users could lose draft data.
-// - onCreated, onRendered and onDestroyed can be hooked with the eponym args; they will be called at the end of the components'. ❗ this is passed as first arg, autorun is handle additionnally to onCreated
+    // - onCreated, onRendered and onDestroyed can be hooked with the eponym args; they will be called at the end of the components'. ❗ this is passed as first arg, autorun is handle additionnally to onCreated
     const data = this.data();
     this.popupArgs = {
+      _id: this._id,
       name: data.name,
       showHeader: data.showHeader ?? true,
       title: data.title,
@@ -764,16 +769,28 @@ class PopupComponent extends BlazeComponent {
       throw new Error(`template and/or component ${this.name} not found`);
     }
 
-    // If arg is not set, must be closed manually by calling destroy()
-    if (this.popupArgs.closeVar) {
-      this.closeInitialValue = Session.get(this.data().closeVar);
-      if (!this.closeInitialValue === undefined) {
-        this.autorun(() => {
-          if (Session.get(this.data().closeVar) !== this.closeInitialValue) {
-            this.onDestroyed();
-          }
-        });
-      }
+    // We close a potential opened popup on any left click on the document, or go
+    // one step back by pressing escape.
+    for (const action of ['back', 'close']) {
+      const self = this;
+      EscapeActions.register(
+        // hard-coded in escapeActions.js
+        `popup-${action}`,
+        () => self.destroy,
+        // For clicks, only trigger escape when click is outside any popup
+        (target) => {
+          if (!target) {return PopupComponent.stack.length > 0}
+          return !PopupComponent.findParentPopup();
+        },
+      );
+    }
+    // Child popups will register so closing can cascade
+    // However they won't probably because of the unorthodox DOM stuff
+    // Theorically only one child is possible because popups are all siblings
+    this.children = [];
+    const parentCandidate = PopupComponent.findParentPopup(this.popupArgs.openerElement);
+    if (parentCandidate) {
+      parentCandidate.controlComponent.children.push(this);
     }
   }
 
@@ -859,7 +876,7 @@ class PopupComponent extends BlazeComponent {
     if (opener.classList?.contains?.(this.popupPlaceholderClass())) {
       sizedOpener = opener.parentNode;
     }
-// in some cases, opener is re-rendered while popup tries to position
+    // in some cases, opener is re-rendered while popup tries to position
     // better freeze the opener dims
     this.popupArgs.nonPlaceholderDims = sizedOpener.getBoundingClientRect();
 
@@ -874,7 +891,7 @@ class PopupComponent extends BlazeComponent {
       console.error(`cannot render popup ${this.name}: ${e}`);
       this.destroy();
     }
-  
+
 
   }
 
@@ -884,7 +901,7 @@ class PopupComponent extends BlazeComponent {
     if (this.detached) {return}
     this.userClose = userClose;
     this.detached = true;
-for (const child of     this.children) {child.destroy()}
+    for (const child of this.children) {child.destroy()}
     this.observeChild?.disconnect();
 
     // not necesserly removed in order, e.g. multiple cards
