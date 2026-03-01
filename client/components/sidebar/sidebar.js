@@ -929,8 +929,8 @@ BlazeComponent.extendComponent({
     );
   },
 
-  isListSelected(boardId, listId) {
-    return ReactiveCache.getBoard(boardId).subtasksDefaultListId === listId;
+  isListSelected(listId) {
+    return ReactiveCache.getBoard(this.currentBoard.subtasksDefaultBoardId).subtasksDefaultListId === listId;
   },
 
   presentParentTask() {
