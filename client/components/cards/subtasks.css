@@ -130,7 +130,12 @@ textarea.js-edit-subtask-item {
 .subtasks {
   background: #f7f7f7;
 }
-.subtasks.placeholder {
+.card-subtasks-hint {
+  font-style: italic;
+  font-size: var(--step--1);
+  font-weight: normal;
+}
+.subtask.placeholder {
   background: #ccc;
   border-radius: 2px;
 }

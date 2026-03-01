@@ -2,6 +2,10 @@ template(name="subtasks")
   h3.card-details-item-title
     i.fa.fa-globe
     | {{_ 'subtasks'}}
+    if $gt currentCard.hiddenSubtasksCount 0
+      span.card-subtasks-hint
+        = currentCard.hiddenSubtasksCount
+        | {{ _ 'subtask-hidden-suffix' }}
   if currentUser.isBoardAdmin
     if toggleDeleteDialog.get
       +subtaskDeleteDialog(subtask = subtaskToDelete)
